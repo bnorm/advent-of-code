@@ -23,7 +23,6 @@ fn part1() {
 
 fn part2() {
     let filename = "input.txt";
-
     let contents = fs::read_to_string(filename)
         .expect("Something went wrong reading the file");
 
