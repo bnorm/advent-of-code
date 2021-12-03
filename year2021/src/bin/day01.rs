@@ -8,7 +8,7 @@ fn main() {
 }
 
 fn part1() {
-    let filename = "input.txt";
+    let filename = "res/input01.txt";
     let contents = fs::read_to_string(filename)
         .expect("Something went wrong reading the file");
 
@@ -22,7 +22,7 @@ fn part1() {
 }
 
 fn part2() {
-    let filename = "input.txt";
+    let filename = "res/input01.txt";
     let contents = fs::read_to_string(filename)
         .expect("Something went wrong reading the file");
 

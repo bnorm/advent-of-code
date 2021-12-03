@@ -18,7 +18,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "year2021-day02"
+name = "year2021"
 version = "0.1.0"
 dependencies = [
  "itertools",
