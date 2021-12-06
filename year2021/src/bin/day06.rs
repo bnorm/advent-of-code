@@ -1,24 +1,29 @@
 use std::fs;
-use std::collections::{HashMap, VecDeque};
-use std::io::repeat;
+use std::time::Instant;
 
 use itertools::Itertools;
 
-use year2021::geo::{intersection, Line, Point};
-
 fn main() {
+    let start = Instant::now();
     println!("[part1] answer={:?}", part1());
     println!("[part2] answer={:?}", part2());
+    println!("finished in {:?}", start.elapsed());
 }
 
-fn part1() -> Option<i64> {
+fn part1() -> Option<u128> {
+    let start = Instant::now();
     let fishes = read_input()?;
-    return Some(propagate(80, &fishes));
+    let result = Some(propagate(80, &fishes));
+    println!("[part1] time={:?}", start.elapsed());
+    return result;
 }
 
-fn part2() -> Option<i64> {
+fn part2() -> Option<u128> {
+    let start = Instant::now();
     let fishes = read_input()?;
-    return Some(propagate(256, &fishes));
+    let result = Some(propagate(256, &fishes));
+    println!("[part2] time={:?}", start.elapsed());
+    return result;
 }
 
 fn read_input() -> Option<Vec<i32>> {
@@ -33,21 +38,15 @@ fn read_input() -> Option<Vec<i32>> {
     return Some(input);
 }
 
-fn propagate(days: i32, fishes: &Vec<i32>) -> i64 {
-    let mut stack: VecDeque<i64> = VecDeque::new();
-    for _ in 0..9 {
-        stack.push_back(0)
-    }
-
+fn propagate(days: i32, fishes: &Vec<i32>) -> u128 {
+    let mut fish: [u128; 9] = [0; 9];
     for f in fishes {
-        stack[*f as usize] += 1;
+        fish[*f as usize] += 1;
     }
 
-    for _ in 0..days {
-        let born = stack.pop_front().unwrap_or(0);
-        stack.push_back(born);
-        stack[6] += born;
+    for day in 0..days as usize {
+        fish[(day + 7) % 9] += fish[day % 9]
     }
 
-    return stack.iter().sum();
+    return fish.iter().sum();
 }
