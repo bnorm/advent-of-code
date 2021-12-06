@@ -1,43 +1,40 @@
 use std::fs;
 
-use itertools::Itertools;
+const BITS: u32 = 12;
 
 fn main() {
-    part1();
-    part2();
+    println!("[part1] answer={:?}", part1());
+    println!("[part2] answer={:?}", part2());
 }
 
-fn part1() {
+fn part1() -> Option<u32> {
     let filename = "res/input03.txt";
     let contents = fs::read_to_string(filename)
         .expect("Something went wrong reading the file");
 
-    let bits = &12;
-    let lines = contents.lines()
-        .filter(|line| { line.len() > 0 })
-        .map(|line| { i32::from_str_radix(line, 2).unwrap() as i32 })
-        .collect_vec();
+    let lines: Vec<u32> = contents.lines()
+        .filter_map(|line| u32::from_str_radix(line, 2).ok())
+        .collect();
 
-    let g = gamma(bits, &lines);
-    let e = epsilon(bits, &lines);
+    let g = gamma(&BITS, &lines);
+    let e = epsilon(&BITS, &lines);
 
-    println!("[part1] gamma={} epsilon={} answer={}", g, e, g * e);
+    println!("[part1] gamma={} epsilon={}", g, e);
+    return Some(g * e);
 }
 
-fn part2() {
+fn part2() -> Option<u32> {
     let filename = "res/input03.txt";
     let contents = fs::read_to_string(filename)
         .expect("Something went wrong reading the file");
 
-    let bits = &12;
-    let lines = contents.lines()
-        .filter(|line| { line.len() > 0 })
-        .map(|line| { i32::from_str_radix(line, 2).unwrap() as i32 })
-        .collect_vec();
+    let lines: Vec<u32> = contents.lines()
+        .filter_map(|line| u32::from_str_radix(line, 2).ok())
+        .collect();
 
     let mut ogr = 0;
     let mut remaining = lines.to_vec();
-    for bit in (0..*bits).rev() {
+    for bit in (0..BITS).rev() {
         ogr = (ogr << 1) + most_common(&bit, &remaining);
         remaining.retain(|x| { ogr == (x >> bit) });
 
@@ -49,7 +46,7 @@ fn part2() {
 
     let mut csr = 0;
     remaining = lines.to_vec();
-    for bit in (0..*bits).rev() {
+    for bit in (0..BITS).rev() {
         csr = (csr << 1) + (1 - most_common(&bit, &remaining));
         remaining.retain(|x| { csr == (x >> bit) });
 
@@ -59,10 +56,11 @@ fn part2() {
         }
     }
 
-    println!("[part2] oxygen_generator_rating={} co2_scrubber_rating={} answer={}", ogr, csr, ogr * csr);
+    println!("[part2] oxygen_generator_rating={} co2_scrubber_rating={}", ogr, csr);
+    return Some(ogr * csr);
 }
 
-fn gamma(bits: &usize, lines: &Vec<i32>) -> i32 {
+fn gamma(bits: &u32, lines: &Vec<u32>) -> u32 {
     let mut gamma = 0;
     for bit in (0..*bits).rev() {
         gamma = (gamma << 1) + most_common(&bit, lines);
@@ -70,7 +68,7 @@ fn gamma(bits: &usize, lines: &Vec<i32>) -> i32 {
     return gamma;
 }
 
-fn epsilon(bits: &usize, lines: &Vec<i32>) -> i32 {
+fn epsilon(bits: &u32, lines: &Vec<u32>) -> u32 {
     let mut epsilon = 0;
     for bit in (0..*bits).rev() {
         epsilon = (epsilon << 1) + (1 - most_common(&bit, lines));
@@ -78,7 +76,7 @@ fn epsilon(bits: &usize, lines: &Vec<i32>) -> i32 {
     return epsilon;
 }
 
-fn most_common(bit: &usize, lines: &Vec<i32>) -> i32 {
+fn most_common(bit: &u32, lines: &Vec<u32>) -> u32 {
     let half_size = lines.len() as f32 / 2.0;
     let mut count = 0;
     for line in lines {

@@ -1,64 +1,73 @@
 use std::fs;
 
 use itertools::Itertools;
+use recap::Recap;
+use serde::Deserialize;
 
-fn main() {
-    part1();
-    part2();
+#[derive(Debug, PartialEq, Deserialize, Recap)]
+#[recap(regex = r#"(?P<op>[a-z]+) (?P<n>\d+)"#)]
+struct Command {
+    op: Op,
+    n: i32,
 }
 
-fn part1() {
+#[derive(Debug, PartialEq, Deserialize)]
+#[serde(rename_all = "lowercase")]
+enum Op {
+    Forward,
+    Down,
+    Up,
+}
+
+fn main() {
+    println!("[part1] answer={:?}", part1());
+    println!("[part2] answer={:?}", part2());
+}
+
+fn part1() -> Option<i32> {
     let filename = "res/input02.txt";
-    let contents = fs::read_to_string(filename)
-        .expect("Something went wrong reading the file");
+    let contents = fs::read_to_string(filename).ok()?;
 
     let commands = contents.lines()
-        .map(|x| {
-            let split = x.split_whitespace().collect_vec();
-            return (split[0], split[1].parse::<i32>().expect("Unable to parse file line as int"));
-        })
+        .filter_map(|line| line.parse::<Command>().ok())
         .collect_vec();
 
-    let mut depth = 0;
-    let mut position = 0;
-    for (op, n) in commands {
-        if op == "forward" {
-            position = position + n;
-        } else if op == "down" {
-            depth = depth + n
-        } else if op == "up" {
-            depth = depth - n
+    let mut depth: i32 = 0;
+    let mut position: i32 = 0;
+    for command in commands {
+        match command {
+            Command { op: Op::Forward, n } => position += n,
+            Command { op: Op::Down, n } => depth += n,
+            Command { op: Op::Up, n } => depth -= n,
         }
     }
 
-    println!("[part1] position={} depth={} answer={}", position, depth, position * depth);
+    println!("[part1] position={} depth={}", position, depth);
+    return Some(position * depth)
 }
 
-fn part2() {
+fn part2() -> Option<i32> {
     let filename = "res/input02.txt";
-    let contents = fs::read_to_string(filename)
-        .expect("Something went wrong reading the file");
+    let contents = fs::read_to_string(filename).ok()?;
 
     let commands = contents.lines()
-        .map(|x| {
-            let split = x.split_whitespace().collect_vec();
-            return (split[0], split[1].parse::<i32>().expect("Unable to parse file line as int"));
-        })
+        .filter_map(|line| line.parse::<Command>().ok())
         .collect_vec();
 
     let mut depth = 0;
     let mut position = 0;
     let mut aim = 0;
-    for (op, n) in commands {
-        if op == "forward" {
-            position = position + n;
-            depth = depth + n * aim;
-        } else if op == "down" {
-            aim = aim + n;
-        } else if op == "up" {
-            aim = aim - n;
+    for command in commands {
+        match command {
+            Command { op: Op::Forward, n } => {
+                position += n;
+                depth += n * aim;
+            }
+            Command { op: Op::Down, n } => aim += n,
+            Command { op: Op::Up, n } => aim -= n,
         }
     }
 
-    println!("[part2] position={} depth={} answer={}", position, depth, position * depth);
+    println!("[part2] position={} depth={}", position, depth);
+    return Some(position * depth)
 }
