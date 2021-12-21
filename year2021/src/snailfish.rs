@@ -1,6 +1,7 @@
 use std::{fmt, io, str};
 use std::fmt::{Debug, Display, Formatter};
 use std::io::ErrorKind;
+use std::ops::Add;
 use std::str::{Chars, FromStr};
 
 #[derive(PartialEq, PartialOrd, Eq, Ord, Hash, Clone)]
@@ -52,12 +53,12 @@ impl FromStr for Node {
                     }
                     Ok(Node::pair(left, right))
                 }
-                Some(c) => {
+                Some(c) if '0' <= c && c <= '9' => {
                     let mut number = String::new();
                     number.push(c);
                     let mut peek = chars.clone();
                     while let Some(c) = peek.next() {
-                        if c >= '0' && c <= '9' {
+                        if '0' <= c && c <= '9' {
                             number.push(chars.next().unwrap());
                         } else {
                             break;
@@ -66,11 +67,33 @@ impl FromStr for Node {
                     // TODO convert error
                     Ok(Node::Value(number.parse::<u32>().expect("not a number")))
                 }
-                None => Err(io::Error::from(ErrorKind::UnexpectedEof))
+                Some(c) => Err(io::Error::new(ErrorKind::InvalidInput, format!("unexpected c={}", c))),
+                _ => Err(io::Error::from(ErrorKind::UnexpectedEof))
             };
         }
 
         return recurse(&mut s.trim().chars());
+    }
+}
+
+impl<'a, 'b> Add<&'b Node> for &'a Node {
+    type Output = Node;
+
+    fn add(self, other: &'b Node) -> Node {
+        let mut node = Node::pair(self.clone(), other.clone());
+        // println!("after addition: {}", node);
+        loop {
+            if let Some(n) = node.explode() {
+                node = n;
+                // println!("after explode:  {}", node);
+            } else if let Some(n) = node.split() {
+                node = n;
+                // println!("after split:    {}", node);
+            } else {
+                break;
+            }
+        }
+        return node;
     }
 }
 
@@ -94,26 +117,9 @@ impl Node {
         let mut iter = nodes.iter();
         let mut node = iter.next()?.clone();
         while let Some(next) = iter.next() {
-            node = node.add(next);
+            node = &node + next;
         }
         return Some(node);
-    }
-
-    pub fn add(&self, right: &Node) -> Node {
-        let mut node = Node::pair(self.clone(), right.clone());
-        // println!("after addition: {}", node);
-        loop {
-            if let Some(n) = node.explode() {
-                node = n;
-                // println!("after explode:  {}", node);
-            } else if let Some(n) = node.split() {
-                node = n;
-                // println!("after split:    {}", node);
-            } else {
-                break;
-            }
-        }
-        return node;
     }
 
     fn explode(&self) -> Option<Node> {

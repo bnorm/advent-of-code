@@ -24,13 +24,16 @@ fn main() {
     println!("[part2] answer={:?}", part2());
 }
 
-fn part1() -> Option<i32> {
+fn read_input() -> Vec<Command> {
     let filename = "res/input02.txt";
-    let contents = fs::read_to_string(filename).ok()?;
-
-    let commands = contents.lines()
+    let contents = fs::read_to_string(filename).unwrap();
+    return contents.lines()
         .filter_map(|line| line.parse::<Command>().ok())
         .collect_vec();
+}
+
+fn part1() -> Option<i32> {
+    let commands = read_input();
 
     let mut depth: i32 = 0;
     let mut position: i32 = 0;
@@ -43,16 +46,11 @@ fn part1() -> Option<i32> {
     }
 
     println!("[part1] position={} depth={}", position, depth);
-    return Some(position * depth)
+    return Some(position * depth);
 }
 
 fn part2() -> Option<i32> {
-    let filename = "res/input02.txt";
-    let contents = fs::read_to_string(filename).ok()?;
-
-    let commands = contents.lines()
-        .filter_map(|line| line.parse::<Command>().ok())
-        .collect_vec();
+    let commands = read_input();
 
     let mut depth = 0;
     let mut position = 0;
@@ -69,5 +67,5 @@ fn part2() -> Option<i32> {
     }
 
     println!("[part2] position={} depth={}", position, depth);
-    return Some(position * depth)
+    return Some(position * depth);
 }

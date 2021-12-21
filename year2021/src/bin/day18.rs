@@ -25,8 +25,8 @@ fn part2() -> Option<u128> {
     let mut result = 0;
     for i in 0..nodes.len() {
         for j in i + 1..nodes.len() {
-            result = max(result, nodes[i].add(&nodes[j]).magnitude());
-            result = max(result, nodes[j].add(&nodes[i]).magnitude());
+            result = max(result, (&nodes[i] + &nodes[j]).magnitude());
+            result = max(result, (&nodes[j] + &nodes[i]).magnitude());
         }
     }
 
