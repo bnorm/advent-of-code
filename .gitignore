@@ -4,6 +4,7 @@ build/
 
 # Cargo
 target/
+Cargo.lock
 
 # JetBrains
 *.iml

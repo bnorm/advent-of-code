@@ -1,6 +1,4 @@
-use std::iter::FlatMap;
 use std::ops::{Index, IndexMut};
-use std::slice::Iter;
 
 #[derive(Debug, Clone, Hash, Eq, PartialEq)]
 pub struct Grid<T> {
@@ -23,7 +21,7 @@ impl<T> Grid<T> {
     }
 }
 
-#[derive(Debug, Clone, Hash, Eq, PartialEq)]
+#[derive(Debug, Copy, Clone, Hash, Eq, PartialEq)]
 pub struct Position {
     pub row: usize,
     pub col: usize,
