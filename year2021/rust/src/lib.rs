@@ -4,3 +4,4 @@ pub mod packet;
 pub mod snailfish;
 pub mod scanner;
 pub mod cube;
+pub mod search;
