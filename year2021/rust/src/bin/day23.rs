@@ -135,26 +135,6 @@ fn read_input(file: &str) -> Input {
 fn part1(input: &Input) -> Option<usize> {
     let instant = Instant::now();
 
-    // let start = read_input("res/input23_start.txt");
-    // let start_node = Node::new(start.clone(), 0);
-    // println!("cost=0 dist={} total={}", start_node.dist, start_node.cost + start_node.dist);
-    // println!("{}", start);
-    // println!();
-    //
-    // let mut search = BinaryHeap::<Node>::new();
-    // for (state, cost) in start.possible_moves() {
-    //     let node = Node::new(state.clone(), cost);
-    //     search.push(node);
-    // }
-    //
-    // while let Some(node) = search.pop() {
-    //     println!("cost={} dist={} total={}", node.cost, node.dist, node.cost + node.dist);
-    //     println!("{}", node.state);
-    //     println!();
-    // }
-    //
-    // return None;
-
     let mut search = BinaryHeap::<Node>::new();
     search.push(Node::new(input.clone(), 0));
 

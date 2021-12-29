@@ -5,3 +5,4 @@ pub mod snailfish;
 pub mod scanner;
 pub mod cube;
 pub mod search;
+pub mod alu;
