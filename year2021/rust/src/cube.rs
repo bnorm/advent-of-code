@@ -10,12 +10,24 @@ pub struct Cube<T> {
 }
 
 impl<T> Cube<T> {
-    pub fn new(values: Vec<Vec<Vec<T>>>, x_range: Range<isize>, y_range: Range<isize>, z_range: Range<isize>) -> Self {
-        return Cube { values, x_range, y_range, z_range };
+    pub fn new(
+        values: Vec<Vec<Vec<T>>>,
+        x_range: Range<isize>,
+        y_range: Range<isize>,
+        z_range: Range<isize>,
+    ) -> Self {
+        return Cube {
+            values,
+            x_range,
+            y_range,
+            z_range,
+        };
     }
 
     pub fn contains(&self, position: &Position) -> bool {
-        return self.x_range.contains(&position.x) && self.y_range.contains(&position.y) && self.z_range.contains(&position.z);
+        return self.x_range.contains(&position.x)
+            && self.y_range.contains(&position.y)
+            && self.z_range.contains(&position.z);
     }
 }
 
@@ -36,16 +48,19 @@ impl<T> Index<&Position> for Cube<T> {
     type Output = T;
 
     fn index(&self, position: &Position) -> &Self::Output {
-        return &self.values[(position.x - self.x_range.start) as usize][(position.y - self.y_range.start) as usize][(position.z - self.z_range.start) as usize];
+        return &self.values[(position.x - self.x_range.start) as usize]
+            [(position.y - self.y_range.start) as usize]
+            [(position.z - self.z_range.start) as usize];
     }
 }
 
 impl<T> IndexMut<&Position> for Cube<T> {
     fn index_mut(&mut self, position: &Position) -> &mut Self::Output {
-        return &mut self.values[(position.x - self.x_range.start) as usize][(position.y - self.y_range.start) as usize][(position.z - self.z_range.start) as usize];
+        return &mut self.values[(position.x - self.x_range.start) as usize]
+            [(position.y - self.y_range.start) as usize]
+            [(position.z - self.z_range.start) as usize];
     }
 }
-
 
 #[derive(Debug, Clone, Hash, Eq, PartialEq)]
 pub struct Region {
@@ -55,8 +70,16 @@ pub struct Region {
 }
 
 impl Region {
-    pub fn new(x_range: RangeInclusive<isize>, y_range: RangeInclusive<isize>, z_range: RangeInclusive<isize>) -> Self {
-        return Region { x_range, y_range, z_range };
+    pub fn new(
+        x_range: RangeInclusive<isize>,
+        y_range: RangeInclusive<isize>,
+        z_range: RangeInclusive<isize>,
+    ) -> Self {
+        return Region {
+            x_range,
+            y_range,
+            z_range,
+        };
     }
 
     pub fn intersect(&self, other: &Region) -> bool {
@@ -82,19 +105,70 @@ impl Region {
             }
 
             // X
-            if region.x_range.contains(self.x_range.start()) && region.x_range.contains(self.x_range.end()) {
+            if region.x_range.contains(self.x_range.start())
+                && region.x_range.contains(self.x_range.end())
+            {
                 // split x
-                push_region(&mut splits_y, Region::new(*region.x_range.start()..=*self.x_range.start() - 1, region.y_range.clone(), region.z_range.clone()));
-                push_region(&mut splits_y, Region::new(*self.x_range.start()..=*self.x_range.end(), region.y_range.clone(), region.z_range.clone()));
-                push_region(&mut splits_y, Region::new(*self.x_range.end() + 1..=*region.x_range.end(), region.y_range.clone(), region.z_range.clone()));
+                push_region(
+                    &mut splits_y,
+                    Region::new(
+                        *region.x_range.start()..=*self.x_range.start() - 1,
+                        region.y_range.clone(),
+                        region.z_range.clone(),
+                    ),
+                );
+                push_region(
+                    &mut splits_y,
+                    Region::new(
+                        *self.x_range.start()..=*self.x_range.end(),
+                        region.y_range.clone(),
+                        region.z_range.clone(),
+                    ),
+                );
+                push_region(
+                    &mut splits_y,
+                    Region::new(
+                        *self.x_range.end() + 1..=*region.x_range.end(),
+                        region.y_range.clone(),
+                        region.z_range.clone(),
+                    ),
+                );
             } else if region.x_range.contains(self.x_range.start()) {
                 // split x
-                push_region(&mut splits_y, Region::new(*region.x_range.start()..=*self.x_range.start() - 1, region.y_range.clone(), region.z_range.clone()));
-                push_region(&mut splits_y, Region::new(*self.x_range.start()..=*region.x_range.end(), region.y_range.clone(), region.z_range.clone()));
+                push_region(
+                    &mut splits_y,
+                    Region::new(
+                        *region.x_range.start()..=*self.x_range.start() - 1,
+                        region.y_range.clone(),
+                        region.z_range.clone(),
+                    ),
+                );
+                push_region(
+                    &mut splits_y,
+                    Region::new(
+                        *self.x_range.start()..=*region.x_range.end(),
+                        region.y_range.clone(),
+                        region.z_range.clone(),
+                    ),
+                );
             } else if region.x_range.contains(self.x_range.end()) {
                 // split x
-                push_region(&mut splits_y, Region::new(*region.x_range.start()..=*self.x_range.end(), region.y_range.clone(), region.z_range.clone()));
-                push_region(&mut splits_y, Region::new(*self.x_range.end() + 1..=*region.x_range.end(), region.y_range.clone(), region.z_range.clone()));
+                push_region(
+                    &mut splits_y,
+                    Region::new(
+                        *region.x_range.start()..=*self.x_range.end(),
+                        region.y_range.clone(),
+                        region.z_range.clone(),
+                    ),
+                );
+                push_region(
+                    &mut splits_y,
+                    Region::new(
+                        *self.x_range.end() + 1..=*region.x_range.end(),
+                        region.y_range.clone(),
+                        region.z_range.clone(),
+                    ),
+                );
             } else {
                 push_region(&mut splits_y, region);
             }
@@ -109,19 +183,70 @@ impl Region {
             }
 
             // Y
-            if region.y_range.contains(self.y_range.start()) & &region.y_range.contains(self.y_range.end()) {
+            if region.y_range.contains(self.y_range.start())
+                & &region.y_range.contains(self.y_range.end())
+            {
                 // split y
-                push_region(&mut splits_z, Region::new(region.x_range.clone(), *region.y_range.start()..=*self.y_range.start() - 1, region.z_range.clone()));
-                push_region(&mut splits_z, Region::new(region.x_range.clone(), *self.y_range.start()..=*self.y_range.end(), region.z_range.clone()));
-                push_region(&mut splits_z, Region::new(region.x_range.clone(), *self.y_range.end() + 1..=*region.y_range.end(), region.z_range.clone()));
+                push_region(
+                    &mut splits_z,
+                    Region::new(
+                        region.x_range.clone(),
+                        *region.y_range.start()..=*self.y_range.start() - 1,
+                        region.z_range.clone(),
+                    ),
+                );
+                push_region(
+                    &mut splits_z,
+                    Region::new(
+                        region.x_range.clone(),
+                        *self.y_range.start()..=*self.y_range.end(),
+                        region.z_range.clone(),
+                    ),
+                );
+                push_region(
+                    &mut splits_z,
+                    Region::new(
+                        region.x_range.clone(),
+                        *self.y_range.end() + 1..=*region.y_range.end(),
+                        region.z_range.clone(),
+                    ),
+                );
             } else if region.y_range.contains(self.y_range.start()) {
                 // split y
-                push_region(&mut splits_z, Region::new(region.x_range.clone(), *region.y_range.start()..=*self.y_range.start() - 1, region.z_range.clone()));
-                push_region(&mut splits_z, Region::new(region.x_range.clone(), *self.y_range.start()..=*region.y_range.end(), region.z_range.clone()));
+                push_region(
+                    &mut splits_z,
+                    Region::new(
+                        region.x_range.clone(),
+                        *region.y_range.start()..=*self.y_range.start() - 1,
+                        region.z_range.clone(),
+                    ),
+                );
+                push_region(
+                    &mut splits_z,
+                    Region::new(
+                        region.x_range.clone(),
+                        *self.y_range.start()..=*region.y_range.end(),
+                        region.z_range.clone(),
+                    ),
+                );
             } else if region.y_range.contains(self.y_range.end()) {
                 // split y
-                push_region(&mut splits_z, Region::new(region.x_range.clone(), *region.y_range.start()..=*self.y_range.end(), region.z_range.clone()));
-                push_region(&mut splits_z, Region::new(region.x_range.clone(), *self.y_range.end() + 1..=*region.y_range.end(), region.z_range.clone()));
+                push_region(
+                    &mut splits_z,
+                    Region::new(
+                        region.x_range.clone(),
+                        *region.y_range.start()..=*self.y_range.end(),
+                        region.z_range.clone(),
+                    ),
+                );
+                push_region(
+                    &mut splits_z,
+                    Region::new(
+                        region.x_range.clone(),
+                        *self.y_range.end() + 1..=*region.y_range.end(),
+                        region.z_range.clone(),
+                    ),
+                );
             } else {
                 push_region(&mut splits_z, region);
             }
@@ -136,19 +261,70 @@ impl Region {
             }
 
             // Z
-            if region.z_range.contains(self.z_range.start()) & &region.z_range.contains(self.z_range.end()) {
+            if region.z_range.contains(self.z_range.start())
+                & &region.z_range.contains(self.z_range.end())
+            {
                 // split z
-                push_region(&mut splits_x, Region::new(region.x_range.clone(), region.y_range.clone(), *region.z_range.start()..=*self.z_range.start() - 1));
-                push_region(&mut splits_x, Region::new(region.x_range.clone(), region.y_range.clone(), *self.z_range.start()..=*self.z_range.end()));
-                push_region(&mut splits_x, Region::new(region.x_range.clone(), region.y_range.clone(), *self.z_range.end() + 1..=*region.z_range.end()));
+                push_region(
+                    &mut splits_x,
+                    Region::new(
+                        region.x_range.clone(),
+                        region.y_range.clone(),
+                        *region.z_range.start()..=*self.z_range.start() - 1,
+                    ),
+                );
+                push_region(
+                    &mut splits_x,
+                    Region::new(
+                        region.x_range.clone(),
+                        region.y_range.clone(),
+                        *self.z_range.start()..=*self.z_range.end(),
+                    ),
+                );
+                push_region(
+                    &mut splits_x,
+                    Region::new(
+                        region.x_range.clone(),
+                        region.y_range.clone(),
+                        *self.z_range.end() + 1..=*region.z_range.end(),
+                    ),
+                );
             } else if region.z_range.contains(self.z_range.start()) {
                 // split z
-                push_region(&mut splits_x, Region::new(region.x_range.clone(), region.y_range.clone(), *region.z_range.start()..=*self.z_range.start() - 1));
-                push_region(&mut splits_x, Region::new(region.x_range.clone(), region.y_range.clone(), *self.z_range.start()..=*region.z_range.end()));
+                push_region(
+                    &mut splits_x,
+                    Region::new(
+                        region.x_range.clone(),
+                        region.y_range.clone(),
+                        *region.z_range.start()..=*self.z_range.start() - 1,
+                    ),
+                );
+                push_region(
+                    &mut splits_x,
+                    Region::new(
+                        region.x_range.clone(),
+                        region.y_range.clone(),
+                        *self.z_range.start()..=*region.z_range.end(),
+                    ),
+                );
             } else if region.z_range.contains(self.z_range.end()) {
                 // split z
-                push_region(&mut splits_x, Region::new(region.x_range.clone(), region.y_range.clone(), *region.z_range.start()..=*self.z_range.end()));
-                push_region(&mut splits_x, Region::new(region.x_range.clone(), region.y_range.clone(), *self.z_range.end() + 1..=*region.z_range.end()));
+                push_region(
+                    &mut splits_x,
+                    Region::new(
+                        region.x_range.clone(),
+                        region.y_range.clone(),
+                        *region.z_range.start()..=*self.z_range.end(),
+                    ),
+                );
+                push_region(
+                    &mut splits_x,
+                    Region::new(
+                        region.x_range.clone(),
+                        region.y_range.clone(),
+                        *self.z_range.end() + 1..=*region.z_range.end(),
+                    ),
+                );
             } else {
                 push_region(&mut splits_x, region);
             }
@@ -174,8 +350,14 @@ fn push_region(sink: &mut VecDeque<Region>, region: Region) {
     }
 }
 
-fn range_intersect<T>(first: &RangeInclusive<T>, second: &RangeInclusive<T>) -> bool where T: PartialOrd<T> {
-    return first.contains(second.start()) || first.contains(second.end()) || second.contains(first.start()) || second.contains(first.end());
+fn range_intersect<T>(first: &RangeInclusive<T>, second: &RangeInclusive<T>) -> bool
+where
+    T: PartialOrd<T>,
+{
+    return first.contains(second.start())
+        || first.contains(second.end())
+        || second.contains(first.start())
+        || second.contains(first.end());
 }
 
 #[cfg(test)]
@@ -186,9 +368,7 @@ mod tests {
     fn test_disjoint() {
         let start = Region::new(-5..=-1, -5..=-1, -5..=-1);
         let other = Region::new(1..=5, 1..=5, 1..=5);
-        let expected = vec![
-            Region::new(1..=5, 1..=5, 1..=5)
-        ];
+        let expected = vec![Region::new(1..=5, 1..=5, 1..=5)];
         assert_eq!(start.carve(&other), expected)
     }
 

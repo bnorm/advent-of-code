@@ -1,5 +1,5 @@
-use std::collections::{HashMap, HashSet};
 use std::collections::hash_map::Entry;
+use std::collections::{HashMap, HashSet};
 use std::fs;
 use std::time::Instant;
 
@@ -60,7 +60,8 @@ fn read_input() -> Option<Graph> {
     let filename = "res/input12.txt";
     let contents = fs::read_to_string(filename).ok()?;
 
-    let paths = contents.lines()
+    let paths = contents
+        .lines()
         .filter_map(|line| line.parse::<Input>().ok())
         .collect_vec();
 
@@ -70,8 +71,8 @@ fn read_input() -> Option<Graph> {
             Entry::Occupied(o) => o.into_mut(),
             Entry::Vacant(v) => v.insert(Node {
                 name: path.start.to_string(),
-                paths: vec!(),
-            })
+                paths: vec![],
+            }),
         };
         start.paths.push(path.end.to_string());
 
@@ -79,8 +80,8 @@ fn read_input() -> Option<Graph> {
             Entry::Occupied(o) => o.into_mut(),
             Entry::Vacant(v) => v.insert(Node {
                 name: path.end.to_string(),
-                paths: vec!(),
-            })
+                paths: vec![],
+            }),
         };
         end.paths.push(path.start.to_string());
     }
@@ -95,7 +96,9 @@ fn count_paths(
     memory: &HashSet<&String>,
     doubled: bool,
 ) -> u64 {
-    if current.name == end.name { return 1; }
+    if current.name == end.name {
+        return 1;
+    }
 
     let mut memory = memory.clone();
     if current.name.to_uppercase() != current.name {
@@ -104,7 +107,9 @@ fn count_paths(
 
     let mut count = 0;
     for path in &current.paths {
-        if path == "start" { continue; }
+        if path == "start" {
+            continue;
+        }
 
         if !memory.contains(path) {
             count += count_paths(graph, &graph.nodes[path], end, &memory, doubled);

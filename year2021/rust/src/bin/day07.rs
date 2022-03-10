@@ -40,7 +40,8 @@ fn read_input() -> Option<Vec<i32>> {
     let filename = "res/input07.txt";
     let contents = fs::read_to_string(filename).ok()?;
 
-    let input = contents.lines()
+    let input = contents
+        .lines()
         .flat_map(|line| line.split(","))
         .filter_map(|value| value.parse::<i32>().ok())
         .collect_vec();

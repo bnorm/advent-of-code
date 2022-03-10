@@ -1,8 +1,8 @@
+use itertools::Itertools;
 use std::cmp::max;
 use std::collections::{HashMap, HashSet, VecDeque};
 use std::fs;
 use std::time::Instant;
-use itertools::Itertools;
 
 use year2021::scanner::{parse_scanner_report, Point, Scanner};
 
@@ -42,7 +42,9 @@ fn part2(located_scanners: &[Scanner]) -> Option<isize> {
     let mut max_dist = 0;
     for i in 0..located_scanners.len() {
         for j in i + 1..located_scanners.len() {
-            let dist = located_scanners[i].location.manhattan_distance(&located_scanners[j].location);
+            let dist = located_scanners[i]
+                .location
+                .manhattan_distance(&located_scanners[j].location);
             max_dist = max(max_dist, dist);
         }
     }

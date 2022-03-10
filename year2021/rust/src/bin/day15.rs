@@ -61,10 +61,13 @@ fn read_input() -> Grid<usize> {
     let filename = "res/input15.txt";
     let contents = fs::read_to_string(filename).unwrap();
 
-    let grid = contents.lines()
-        .map(|line| line.chars()
-            .map(|c| c.to_string().parse::<usize>().unwrap())
-            .collect_vec())
+    let grid = contents
+        .lines()
+        .map(|line| {
+            line.chars()
+                .map(|c| c.to_string().parse::<usize>().unwrap())
+                .collect_vec()
+        })
         .collect_vec();
 
     let num_rows = grid.len();
@@ -73,28 +76,46 @@ fn read_input() -> Grid<usize> {
 }
 
 fn calc_path(multiplier: usize, grid: &Grid<usize>) -> usize {
-    let target = Position::new(multiplier * grid.num_rows - 1, multiplier * grid.num_cols - 1);
+    let target = Position::new(
+        multiplier * grid.num_rows - 1,
+        multiplier * grid.num_cols - 1,
+    );
 
     let mut node_queue: BinaryHeap<Node> = BinaryHeap::new();
 
-    node_queue.push(Node::new(Position::new(0, 1), calc_cost(grid, &Position::new(0, 1))));
-    node_queue.push(Node::new(Position::new(1, 0), calc_cost(grid, &Position::new(1, 0))));
+    node_queue.push(Node::new(
+        Position::new(0, 1),
+        calc_cost(grid, &Position::new(0, 1)),
+    ));
+    node_queue.push(Node::new(
+        Position::new(1, 0),
+        calc_cost(grid, &Position::new(1, 0)),
+    ));
 
     let mut memory: HashMap<Position, usize> = HashMap::new();
     memory.insert(Position::new(0, 0), 0);
 
     while let Some(node) = node_queue.pop() {
-        if node.pos == target { return node.cost; }
-
-        if let Some(known_cost) = memory.get(&node.pos) {
-            if *known_cost <= node.cost { continue; }
+        if node.pos == target {
+            return node.cost;
         }
 
-        for neighbour in node.pos.neighbours(multiplier * grid.num_rows, multiplier * grid.num_cols) {
+        if let Some(known_cost) = memory.get(&node.pos) {
+            if *known_cost <= node.cost {
+                continue;
+            }
+        }
+
+        for neighbour in node
+            .pos
+            .neighbours(multiplier * grid.num_rows, multiplier * grid.num_cols)
+        {
             let cost = node.cost + calc_cost(grid, &neighbour);
 
             if let Some(known_cost) = memory.get(&neighbour) {
-                if *known_cost <= cost { continue; }
+                if *known_cost <= cost {
+                    continue;
+                }
             }
 
             node_queue.push(Node::new(neighbour, cost));
@@ -106,7 +127,9 @@ fn calc_path(multiplier: usize, grid: &Grid<usize>) -> usize {
 }
 
 fn calc_cost(grid: &Grid<usize>, position: &Position) -> usize {
-    let grid_cost = grid[&Position::new(position.row % grid.num_rows, position.col % grid.num_cols)];
-    let cost = (grid_cost - 1 + (position.row / grid.num_rows) + (position.col / grid.num_cols)) % 9 + 1;
+    let grid_cost =
+        grid[&Position::new(position.row % grid.num_rows, position.col % grid.num_cols)];
+    let cost =
+        (grid_cost - 1 + (position.row / grid.num_rows) + (position.col / grid.num_cols)) % 9 + 1;
     return cost;
 }

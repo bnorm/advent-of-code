@@ -19,7 +19,8 @@ fn read_input(file: &str) -> Input {
     let filename = file;
     let contents = fs::read_to_string(filename).unwrap();
 
-    let grid = contents.lines()
+    let grid = contents
+        .lines()
         .map(|line| line.chars().collect_vec())
         .collect_vec();
 
@@ -30,7 +31,6 @@ fn read_input(file: &str) -> Input {
 
 fn part1(_input: &Input) -> Option<usize> {
     let instant = Instant::now();
-
 
     let mut grid = _input.clone();
     let mut turns = 1;

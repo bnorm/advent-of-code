@@ -37,7 +37,8 @@ fn part2() -> Option<u128> {
 fn read_input() -> Vec<Node> {
     let filename = "res/input18.txt";
     let contents = fs::read_to_string(filename).unwrap();
-    return contents.lines()
+    return contents
+        .lines()
         .filter_map(|l| l.parse::<Node>().ok())
         .collect();
 }

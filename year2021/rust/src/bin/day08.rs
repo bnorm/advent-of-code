@@ -31,9 +31,12 @@ fn part1() -> Option<usize> {
     let start = Instant::now();
     let input = read_input()?;
 
-    let result = input.iter()
+    let result = input
+        .iter()
         .flat_map(|d| d.output.iter())
-        .filter(|o| o.count_ones() == 2 || o.count_ones() == 3 || o.count_ones() == 4 || o.count_ones() == 7)
+        .filter(|o| {
+            o.count_ones() == 2 || o.count_ones() == 3 || o.count_ones() == 4 || o.count_ones() == 7
+        })
         .count();
 
     println!("[part1] time={:?}", start.elapsed());
@@ -44,9 +47,7 @@ fn part2() -> Option<u32> {
     let start = Instant::now();
     let input = read_input()?;
 
-    let result = input.iter()
-        .filter_map(|d| decode_display(d))
-        .sum();
+    let result = input.iter().filter_map(|d| decode_display(d)).sum();
 
     println!("[part2] time={:?}", start.elapsed());
     return Some(result);
@@ -56,11 +57,20 @@ fn read_input() -> Option<Vec<Display>> {
     let filename = "res/input08.txt";
     let contents = fs::read_to_string(filename).ok()?;
 
-    let input = contents.lines()
+    let input = contents
+        .lines()
         .filter_map(|line| line.parse::<Input>().ok())
         .map(|input| Display {
-            segments: input.segments.split_whitespace().map(|v| segment_to_binary(&v.to_string())).collect_vec(),
-            output: input.output.split_whitespace().map(|v| segment_to_binary(&v.to_string())).collect_vec(),
+            segments: input
+                .segments
+                .split_whitespace()
+                .map(|v| segment_to_binary(&v.to_string()))
+                .collect_vec(),
+            output: input
+                .output
+                .split_whitespace()
+                .map(|v| segment_to_binary(&v.to_string()))
+                .collect_vec(),
         })
         .collect_vec();
 
@@ -69,7 +79,12 @@ fn read_input() -> Option<Vec<Display>> {
 
 fn decode_display(display: &Display) -> Option<u32> {
     let mut known: HashMap<u8, u32> = HashMap::new();
-    let segments = display.segments.iter().chain(display.output.iter()).copied().collect_vec();
+    let segments = display
+        .segments
+        .iter()
+        .chain(display.output.iter())
+        .copied()
+        .collect_vec();
 
     // 2 ones count -> 1
     // 3 ones count -> 7
@@ -88,22 +103,40 @@ fn decode_display(display: &Display) -> Option<u32> {
     // 3 will have all the values of 1
     // 5 will only be missing 1 segment of 4
     // 2 will only be missing 2 segments of 4
-    let three = *segments.iter().find(|&s| s.count_ones() == 5 && s & &one == one).unwrap();
+    let three = *segments
+        .iter()
+        .find(|&s| s.count_ones() == 5 && s & &one == one)
+        .unwrap();
     known.insert(three, 3);
-    let five = *segments.iter().find(|&s| s.count_ones() == 5 && s != &three && (s & &four).count_ones() == 3).unwrap();
+    let five = *segments
+        .iter()
+        .find(|&s| s.count_ones() == 5 && s != &three && (s & &four).count_ones() == 3)
+        .unwrap();
     known.insert(five, 5);
-    let two = *segments.iter().find(|&s| s.count_ones() == 5 && s != &three && (s & &four).count_ones() == 2).unwrap();
+    let two = *segments
+        .iter()
+        .find(|&s| s.count_ones() == 5 && s != &three && (s & &four).count_ones() == 2)
+        .unwrap();
     known.insert(two, 2);
 
     // 6 ones count -> 0, 6, or 9
     // 9 will have all the segments of 4
     // 6 will not have all the segments of 1
     // 0 will not have all the segments of 4
-    let nine = *segments.iter().find(|&s| s.count_ones() == 6 && s & &four == four).unwrap();
+    let nine = *segments
+        .iter()
+        .find(|&s| s.count_ones() == 6 && s & &four == four)
+        .unwrap();
     known.insert(nine, 9);
-    let six = *segments.iter().find(|&s| s.count_ones() == 6 && (s & &one).count_ones() == 1).unwrap();
+    let six = *segments
+        .iter()
+        .find(|&s| s.count_ones() == 6 && (s & &one).count_ones() == 1)
+        .unwrap();
     known.insert(six, 6);
-    let zero = *segments.iter().find(|&s| s.count_ones() == 6 && s != &nine && s != &six).unwrap();
+    let zero = *segments
+        .iter()
+        .find(|&s| s.count_ones() == 6 && s != &nine && s != &six)
+        .unwrap();
     known.insert(zero, 0);
 
     let mut value = 0;

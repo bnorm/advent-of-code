@@ -1,5 +1,5 @@
-use std::collections::{HashMap, HashSet};
 use std::collections::hash_map::Entry;
+use std::collections::{HashMap, HashSet};
 use std::fs;
 use std::time::Instant;
 
@@ -79,11 +79,13 @@ fn read_input() -> Option<(Vec<Point>, Vec<Fold>)> {
     let filename = "res/input13.txt";
     let contents = fs::read_to_string(filename).ok()?;
 
-    let points = contents.lines()
+    let points = contents
+        .lines()
         .filter_map(|line| line.parse::<Point>().ok())
         .collect_vec();
 
-    let folds = contents.lines()
+    let folds = contents
+        .lines()
         .filter_map(|line| line.parse::<Fold>().ok())
         .collect_vec();
 
@@ -97,7 +99,10 @@ fn fold_x(x: u64, points: &Vec<Point>) -> Vec<Point> {
         if p.x < x {
             folded.insert(Point { x: p.x, y: p.y });
         } else {
-            folded.insert(Point { x: 2 * x - p.x, y: p.y });
+            folded.insert(Point {
+                x: 2 * x - p.x,
+                y: p.y,
+            });
         }
     }
 
@@ -111,7 +116,10 @@ fn fold_y(y: u64, points: &Vec<Point>) -> Vec<Point> {
         if p.y < y {
             folded.insert(Point { x: p.x, y: p.y });
         } else {
-            folded.insert(Point { x: p.x, y: 2 * y - p.y });
+            folded.insert(Point {
+                x: p.x,
+                y: 2 * y - p.y,
+            });
         }
     }
 

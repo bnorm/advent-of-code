@@ -28,8 +28,9 @@ fn part2() -> Option<u64> {
     let start = Instant::now();
     let input = read_input()?;
 
-    let mut results = input.iter()
-        .filter_map(|line| { score_incomplete(&line) })
+    let mut results = input
+        .iter()
+        .filter_map(|line| score_incomplete(&line))
         .collect_vec();
 
     results.sort();
@@ -43,7 +44,8 @@ fn read_input() -> Option<Vec<Vec<char>>> {
     let filename = "res/input10.txt";
     let contents = fs::read_to_string(filename).ok()?;
 
-    let input = contents.lines()
+    let input = contents
+        .lines()
         .map(|line| line.chars().collect_vec())
         .collect_vec();
 
@@ -64,7 +66,7 @@ fn score_corruption(line: &Vec<char>) -> Option<u64> {
             ']' => validate(stack.pop_front().unwrap(), &'['),
             '}' => validate(stack.pop_front().unwrap(), &'{'),
             '>' => validate(stack.pop_front().unwrap(), &'<'),
-            _ => None
+            _ => None,
         };
         if result != None {
             return result;
@@ -87,7 +89,7 @@ fn score_incomplete(line: &Vec<char>) -> Option<u64> {
             ']' => validate(stack.pop_front().unwrap(), &'['),
             '}' => validate(stack.pop_front().unwrap(), &'{'),
             '>' => validate(stack.pop_front().unwrap(), &'<'),
-            _ => None
+            _ => None,
         };
         if result != None {
             return None;
@@ -116,7 +118,7 @@ fn score_mismatch(actual: &char) -> u64 {
         '[' => 57,
         '{' => 1197,
         '<' => 25137,
-        _ => todo!()
+        _ => todo!(),
     };
 }
 
@@ -126,6 +128,6 @@ fn score_close(actual: &char) -> u64 {
         '[' => 2,
         '{' => 3,
         '<' => 4,
-        _ => todo!()
+        _ => todo!(),
     };
 }

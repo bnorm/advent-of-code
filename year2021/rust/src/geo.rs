@@ -1,8 +1,8 @@
+use recap::Recap;
+use serde::Deserialize;
 use std::cmp::{max, min};
 use std::ops::Range;
 use std::str::FromStr;
-use serde::Deserialize;
-use recap::Recap;
 
 #[derive(Debug, PartialEq, Eq, Hash)]
 pub struct Point {
@@ -17,8 +17,12 @@ pub struct Line {
 }
 
 impl Line {
-    fn x_range(&self) -> Range<i32> { min(self.p1.x, self.p2.x)..max(self.p1.x, self.p2.x) + 1 }
-    fn y_range(&self) -> Range<i32> { min(self.p1.y, self.p2.y)..max(self.p1.y, self.p2.y) + 1 }
+    fn x_range(&self) -> Range<i32> {
+        min(self.p1.x, self.p2.x)..max(self.p1.x, self.p2.x) + 1
+    }
+    fn y_range(&self) -> Range<i32> {
+        min(self.p1.y, self.p2.y)..max(self.p1.y, self.p2.y) + 1
+    }
 
     fn mxb(&self) -> (i32, i32) {
         let m = (self.p2.y - self.p1.y) / (self.p2.x - self.p1.x);
@@ -33,33 +37,35 @@ pub fn intersection(l1: &Line, l2: &Line) -> Vec<Point> {
 
     let result = if l1_vertical && l2_vertical {
         if l1.p1.x == l2.p1.x {
-            intersection_range(&l1.y_range(), &l2.y_range()).map(|y| Point { x: l1.p1.x, y }).collect()
+            intersection_range(&l1.y_range(), &l2.y_range())
+                .map(|y| Point { x: l1.p1.x, y })
+                .collect()
         } else {
-            vec!()
+            vec![]
         }
     } else if l1_vertical {
         if l2.x_range().contains(&l1.p1.x) {
             let (m, b) = l2.mxb();
             let y = m * l1.p1.x + b;
             if l1.y_range().contains(&y) {
-                vec!(Point { x: l1.p1.x, y })
+                vec![Point { x: l1.p1.x, y }]
             } else {
-                vec!()
+                vec![]
             }
         } else {
-            vec!()
+            vec![]
         }
     } else if l2_vertical {
         if l1.x_range().contains(&l2.p1.x) {
             let (m, b) = l1.mxb();
             let y = m * l2.p1.x + b;
             if l2.y_range().contains(&y) {
-                vec!(Point { x: l2.p1.x, y })
+                vec![Point { x: l2.p1.x, y }]
             } else {
-                vec!()
+                vec![]
             }
         } else {
-            vec!()
+            vec![]
         }
     } else {
         let (m1, b1) = l1.mxb();
@@ -74,16 +80,18 @@ pub fn intersection(l1: &Line, l2: &Line) -> Vec<Point> {
             let x = xf as i32;
             // !!! Sometimes lines CAN intersect but not on an integer 'x' value which does not count !!!
             if xf.fract() == 0.0 && l1.x_range().contains(&x) && l2.x_range().contains(&x) {
-                vec!(Point { x, y: m1 * x + b1 })
+                vec![Point { x, y: m1 * x + b1 }]
             } else {
-                vec!()
+                vec![]
             }
         } else {
             // parallel
             if b1 == b2 {
-                intersection_range(&l1.x_range(), &l2.x_range()).map(|x| Point { x, y: m1 * x + b1 }).collect()
+                intersection_range(&l1.x_range(), &l2.x_range())
+                    .map(|x| Point { x, y: m1 * x + b1 })
+                    .collect()
             } else {
-                vec!()
+                vec![]
             }
         }
     };
@@ -112,17 +120,9 @@ impl FromStr for Line {
     type Err = recap::Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        return s.parse::<LineRecap>().map(|l| {
-            Line {
-                p1: Point {
-                    x: l.x1,
-                    y: l.y1,
-                },
-                p2: Point {
-                    x: l.x2,
-                    y: l.y2,
-                },
-            }
+        return s.parse::<LineRecap>().map(|l| Line {
+            p1: Point { x: l.x1, y: l.y1 },
+            p2: Point { x: l.x2, y: l.y2 },
         });
     }
 }

@@ -67,10 +67,13 @@ fn read_input() -> Option<Vec<Vec<i32>>> {
     let filename = "res/input11.txt";
     let contents = fs::read_to_string(filename).ok()?;
 
-    let input = contents.lines()
-        .map(|line| line.chars()
-            .filter_map(|c| c.to_string().parse::<i32>().ok())
-            .collect_vec())
+    let input = contents
+        .lines()
+        .map(|line| {
+            line.chars()
+                .filter_map(|c| c.to_string().parse::<i32>().ok())
+                .collect_vec()
+        })
         .collect_vec();
 
     return Some(input);

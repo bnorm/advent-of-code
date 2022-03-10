@@ -9,14 +9,18 @@ pub struct Grid<T> {
 
 impl<T> Grid<T> {
     pub fn new(values: Vec<Vec<T>>, num_rows: usize, num_cols: usize) -> Self {
-        return Grid { values, num_rows, num_cols };
+        return Grid {
+            values,
+            num_rows,
+            num_cols,
+        };
     }
 
     pub fn contains(&self, position: &Position) -> bool {
         return position.row < self.num_rows && position.col < self.num_cols;
     }
 
-    pub fn iter(&self) -> impl Iterator<Item=&T> + '_ {
+    pub fn iter(&self) -> impl Iterator<Item = &T> + '_ {
         return self.values.iter().flat_map(|row| row.iter());
     }
 }

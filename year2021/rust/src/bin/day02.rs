@@ -27,7 +27,8 @@ fn main() {
 fn read_input() -> Vec<Command> {
     let filename = "res/input02.txt";
     let contents = fs::read_to_string(filename).unwrap();
-    return contents.lines()
+    return contents
+        .lines()
         .filter_map(|line| line.parse::<Command>().ok())
         .collect_vec();
 }

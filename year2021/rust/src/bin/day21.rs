@@ -25,13 +25,20 @@ struct Dice {
 }
 
 impl Dice {
-    fn new() -> Dice { return Dice { value: 1, roll_count: 0 }; }
+    fn new() -> Dice {
+        return Dice {
+            value: 1,
+            roll_count: 0,
+        };
+    }
 
     fn roll(&mut self) -> usize {
         let result = self.value;
         self.roll_count += 1;
         self.value += 1;
-        if self.value > 100 { self.value = 1; }
+        if self.value > 100 {
+            self.value = 1;
+        }
         return result;
     }
 }
@@ -51,7 +58,11 @@ impl Debug for Player {
 
 impl Player {
     fn new(player: &PlayerStart) -> Player {
-        return Player { id: player.id, location: player.start, score: 0 };
+        return Player {
+            id: player.id,
+            location: player.start,
+            score: 0,
+        };
     }
 
     fn turn(&mut self, die: &mut Dice) -> bool {
@@ -59,7 +70,9 @@ impl Player {
         let roll2 = die.roll();
         let roll3 = die.roll();
         let mut new_location = self.location + roll1 + roll2 + roll3;
-        while new_location > 10 { new_location -= 10 }
+        while new_location > 10 {
+            new_location -= 10
+        }
         self.score += new_location;
         self.location = new_location;
         // println!("Player {} rolls {}+{}+{} and moves to space {} for a total score of {}", self.id, roll1, roll2, roll3, self.location, self.score);
@@ -68,8 +81,14 @@ impl Player {
 
     fn turn_q(&self, die_roll: usize) -> Player {
         let mut new_location = self.location + die_roll;
-        while new_location > 10 { new_location -= 10 }
-        return Player { id: self.id, location: new_location, score: self.score + new_location };
+        while new_location > 10 {
+            new_location -= 10
+        }
+        return Player {
+            id: self.id,
+            location: new_location,
+            score: self.score + new_location,
+        };
     }
 }
 
@@ -84,7 +103,8 @@ fn main() {
 fn read_input() -> Input {
     let filename = "res/input21.txt";
     let contents = fs::read_to_string(filename).unwrap();
-    return contents.lines()
+    return contents
+        .lines()
         .filter_map(|line| line.parse::<PlayerStart>().ok())
         .collect_vec();
 }
@@ -104,7 +124,9 @@ fn part1(input: &Input) -> Option<usize> {
         let mut winner = false;
         for player in &mut players {
             winner = player.turn(&mut die);
-            if winner { break; }
+            if winner {
+                break;
+            }
         }
         if winner {
             let loser = players.iter().filter(|p| p.score < 1000).next().unwrap();
@@ -180,10 +202,13 @@ fn part2(input: &Input) -> Option<usize> {
     return None;
 }
 
-fn increment<T>(results: &mut HashMap<T, u128>, id: T, count: u128) where T: Eq + Hash {
+fn increment<T>(results: &mut HashMap<T, u128>, id: T, count: u128)
+where
+    T: Eq + Hash,
+{
     let value = match results.entry(id) {
         Entry::Occupied(o) => o.into_mut(),
-        Entry::Vacant(v) => v.insert(0)
+        Entry::Vacant(v) => v.insert(0),
     };
     *value += count;
 }

@@ -4,7 +4,7 @@ use std::time::Instant;
 
 use itertools::Itertools;
 
-use year2021::alu::{ALU, Input, Instruction, Variable};
+use year2021::alu::{Input, Instruction, Variable, ALU};
 
 fn main() {
     let start = Instant::now();
@@ -17,7 +17,8 @@ fn main() {
 fn read_input(file: &str) -> Vec<Instruction> {
     let filename = file;
     let contents = fs::read_to_string(filename).unwrap();
-    return contents.lines()
+    return contents
+        .lines()
         .map(|line| Instruction::parse(line))
         .collect_vec();
 }
@@ -25,10 +26,11 @@ fn read_input(file: &str) -> Vec<Instruction> {
 fn part1(input: &Vec<Instruction>) -> Option<usize> {
     let instant = Instant::now();
 
-    let sections = input.split(|instruction| match instruction {
-        Instruction::Inp(_) => true,
-        _ => false,
-    })
+    let sections = input
+        .split(|instruction| match instruction {
+            Instruction::Inp(_) => true,
+            _ => false,
+        })
         .filter(|s| !s.is_empty())
         .collect_vec();
 
@@ -38,30 +40,24 @@ fn part1(input: &Vec<Instruction>) -> Option<usize> {
         digit += 1;
 
         let push = match &section[3] {
-            Instruction::Div(_, i) => {
-                match i {
-                    Input::Value(v) => *v == 1,
-                    _ => unreachable!(),
-                }
-            }
+            Instruction::Div(_, i) => match i {
+                Input::Value(v) => *v == 1,
+                _ => unreachable!(),
+            },
             _ => unreachable!(),
         };
         let c = match &section[4] {
-            Instruction::Add(_, i) => {
-                match i {
-                    Input::Value(v) => *v,
-                    _ => unreachable!(),
-                }
-            }
+            Instruction::Add(_, i) => match i {
+                Input::Value(v) => *v,
+                _ => unreachable!(),
+            },
             _ => unreachable!(),
         };
         let b = match &section[14] {
-            Instruction::Add(_, i) => {
-                match i {
-                    Input::Value(v) => *v,
-                    _ => unreachable!(),
-                }
-            }
+            Instruction::Add(_, i) => match i {
+                Input::Value(v) => *v,
+                _ => unreachable!(),
+            },
             _ => unreachable!(),
         };
 

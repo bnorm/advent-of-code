@@ -1,5 +1,5 @@
-use std::fs;
 use std::collections::HashMap;
+use std::fs;
 
 use itertools::Itertools;
 
@@ -14,7 +14,8 @@ fn part1() -> Option<usize> {
     let filename = "res/input05.txt";
     let contents = fs::read_to_string(filename).ok()?;
 
-    let lines = contents.lines()
+    let lines = contents
+        .lines()
         .filter_map(|line| line.parse::<Line>().ok())
         .filter(|line| line.p1.x == line.p2.x || line.p1.y == line.p2.y)
         .collect_vec();
@@ -28,8 +29,12 @@ fn part1() -> Option<usize> {
 
             for i in intersection(l1, l2) {
                 match grid.get_mut(&i) {
-                    Some(v) => { *v += 1; }
-                    None => { grid.insert(i, 1); }
+                    Some(v) => {
+                        *v += 1;
+                    }
+                    None => {
+                        grid.insert(i, 1);
+                    }
                 }
             }
         }
@@ -42,7 +47,8 @@ fn part2() -> Option<usize> {
     let filename = "res/input05.txt";
     let contents = fs::read_to_string(filename).ok()?;
 
-    let lines = contents.lines()
+    let lines = contents
+        .lines()
         .filter_map(|line| line.parse::<Line>().ok())
         .collect_vec();
 
@@ -55,8 +61,12 @@ fn part2() -> Option<usize> {
 
             for i in intersection(l1, l2) {
                 match grid.get_mut(&i) {
-                    Some(v) => { *v += 1; }
-                    None => { grid.insert(i, 1); }
+                    Some(v) => {
+                        *v += 1;
+                    }
+                    None => {
+                        grid.insert(i, 1);
+                    }
                 }
             }
         }

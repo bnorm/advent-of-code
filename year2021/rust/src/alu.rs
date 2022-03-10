@@ -1,8 +1,8 @@
-use std::collections::{HashMap, VecDeque};
+use itertools::Itertools;
 use std::collections::hash_map::Entry;
+use std::collections::{HashMap, VecDeque};
 use std::ops::{Index, IndexMut};
 use std::slice::Iter;
-use itertools::Itertools;
 
 #[derive(Copy, Clone, PartialEq, Eq, Hash, Debug)]
 pub enum Variable {
@@ -78,7 +78,9 @@ pub struct ALU {
 impl ALU {
     pub fn new(input: Vec<isize>) -> Self {
         let mut variables = HashMap::new();
-        Variable::iterator().for_each(|v| { variables.insert(*v, 0); });
+        Variable::iterator().for_each(|v| {
+            variables.insert(*v, 0);
+        });
 
         let input = VecDeque::from(input);
         Self { variables, input }
@@ -127,7 +129,7 @@ impl IndexMut<&Variable> for ALU {
     fn index_mut(&mut self, variable: &Variable) -> &mut Self::Output {
         return match self.variables.entry(*variable) {
             Entry::Occupied(o) => o.into_mut(),
-            Entry::Vacant(v) => v.insert(0)
+            Entry::Vacant(v) => v.insert(0),
         };
     }
 }

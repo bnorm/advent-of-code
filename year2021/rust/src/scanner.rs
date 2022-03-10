@@ -1,9 +1,9 @@
-use std::collections::{HashMap, HashSet, VecDeque};
-use std::hash::{Hash, Hasher};
-use std::ops::{Add, Sub};
 use itertools::Itertools;
 use recap::Recap;
 use serde::Deserialize;
+use std::collections::{HashMap, HashSet, VecDeque};
+use std::hash::{Hash, Hasher};
+use std::ops::{Add, Sub};
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Scanner {
@@ -21,7 +21,11 @@ impl Hash for Scanner {
 
 impl Scanner {
     fn new(id: usize, location: Point, beacons: Vec<Point>) -> Scanner {
-        return Scanner { id, location, beacons };
+        return Scanner {
+            id,
+            location,
+            beacons,
+        };
     }
 
     fn located(&self, location: Point) -> Scanner {
@@ -60,20 +64,22 @@ impl Scanner {
                         break;
                     }
                 }
-                if !found { remaining.push_back(next) }
+                if !found {
+                    remaining.push_back(next)
+                }
             }
 
             edges = newly_located;
-            if remaining.len() == pending.len() { break; } // infinite loop
+            if remaining.len() == pending.len() {
+                break;
+            } // infinite loop
         }
 
         return result;
     }
 
     fn rotations(&self) -> Vec<Scanner> {
-        let mut beacon_rotations = self.beacons.iter()
-            .map(|p| p.rotations())
-            .collect_vec();
+        let mut beacon_rotations = self.beacons.iter().map(|p| p.rotations()).collect_vec();
 
         let mut result = Vec::<Scanner>::new();
         loop {
@@ -108,9 +114,7 @@ impl Scanner {
     }
 
     fn overlaps(&self, other: &Scanner, delta: &Point) -> bool {
-        let other_beacons: HashSet<Point> = other.beacons.iter()
-            .map(|b| b + delta)
-            .collect();
+        let other_beacons: HashSet<Point> = other.beacons.iter().map(|b| b + delta).collect();
 
         let mut common = 0;
         for b in &self.beacons {
@@ -185,8 +189,8 @@ impl Point {
 
 #[cfg(test)]
 mod tests {
-    use itertools::Itertools;
     use super::*;
+    use itertools::Itertools;
 
     #[test]
     fn test_parse() {}

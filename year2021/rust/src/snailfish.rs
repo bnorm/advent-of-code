@@ -1,8 +1,8 @@
-use std::{fmt, io, str};
 use std::fmt::{Debug, Display, Formatter};
 use std::io::ErrorKind;
 use std::ops::Add;
 use std::str::{Chars, FromStr};
+use std::{fmt, io, str};
 
 #[derive(PartialEq, PartialOrd, Eq, Ord, Hash, Clone)]
 pub enum Node {
@@ -33,7 +33,9 @@ impl Display for Node {
 }
 
 impl Debug for Node {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result { write!(f, "{}", self) }
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self)
+    }
 }
 
 impl FromStr for Node {
@@ -44,11 +46,13 @@ impl FromStr for Node {
             return match chars.next() {
                 Some('[') => {
                     let left = recurse(chars)?;
-                    if let Some(',') = chars.next() {} else {
+                    if let Some(',') = chars.next() {
+                    } else {
                         return Err(io::Error::new(ErrorKind::InvalidInput, "expected ','"));
                     }
                     let right = recurse(chars)?;
-                    if let Some(']') = chars.next() {} else {
+                    if let Some(']') = chars.next() {
+                    } else {
                         return Err(io::Error::new(ErrorKind::InvalidInput, "expected ']'"));
                     }
                     Ok(Node::pair(left, right))
@@ -67,8 +71,11 @@ impl FromStr for Node {
                     // TODO convert error
                     Ok(Node::Value(number.parse::<u32>().expect("not a number")))
                 }
-                Some(c) => Err(io::Error::new(ErrorKind::InvalidInput, format!("unexpected c={}", c))),
-                _ => Err(io::Error::from(ErrorKind::UnexpectedEof))
+                Some(c) => Err(io::Error::new(
+                    ErrorKind::InvalidInput,
+                    format!("unexpected c={}", c),
+                )),
+                _ => Err(io::Error::from(ErrorKind::UnexpectedEof)),
             };
         }
 
@@ -126,18 +133,14 @@ impl Node {
         fn add_left(node: &Node, addition: u32) -> Node {
             match node {
                 Node::Value(v) => Node::Value(*v + addition),
-                Node::Pair(left, right) => {
-                    Node::pair(add_left(left, addition), *right.clone())
-                }
+                Node::Pair(left, right) => Node::pair(add_left(left, addition), *right.clone()),
             }
         }
 
         fn add_right(node: &Node, addition: u32) -> Node {
             match node {
                 Node::Value(v) => Node::Value(*v + addition),
-                Node::Pair(left, right) => {
-                    Node::pair(*left.clone(), add_right(right, addition))
-                }
+                Node::Pair(left, right) => Node::pair(*left.clone(), add_right(right, addition)),
             }
         }
 
@@ -146,15 +149,31 @@ impl Node {
                 Node::Value(_) => None,
                 Node::Pair(left, right) => {
                     if depth >= 4 {
-                        let left_value = if let Node::Value(v) = **left { v } else { unreachable!() };
-                        let right_value = if let Node::Value(v) = **right { v } else { unreachable!() };
+                        let left_value = if let Node::Value(v) = **left {
+                            v
+                        } else {
+                            unreachable!()
+                        };
+                        let right_value = if let Node::Value(v) = **right {
+                            v
+                        } else {
+                            unreachable!()
+                        };
                         Some((Node::Value(0), Some(left_value), Some(right_value)))
                     } else {
                         if let Some((node, l, r)) = recurse(left, depth + 1) {
-                            let new_right = if let Some(a) = r { add_left(right, a) } else { *right.clone() };
+                            let new_right = if let Some(a) = r {
+                                add_left(right, a)
+                            } else {
+                                *right.clone()
+                            };
                             Some((Node::pair(node, new_right), l, None))
                         } else if let Some((node, l, r)) = recurse(right, depth + 1) {
-                            let new_left = if let Some(a) = l { add_right(left, a) } else { *left.clone() };
+                            let new_left = if let Some(a) = l {
+                                add_right(left, a)
+                            } else {
+                                *left.clone()
+                            };
                             Some((Node::pair(new_left, node), None, r))
                         } else {
                             None
@@ -164,14 +183,21 @@ impl Node {
             };
         }
 
-        return if let Some((node, _, _)) = recurse(self, 0) { Some(node) } else { None };
+        return if let Some((node, _, _)) = recurse(self, 0) {
+            Some(node)
+        } else {
+            None
+        };
     }
 
     fn split(&self) -> Option<Node> {
         return match self {
             Node::Value(v) => {
                 if *v >= 10 {
-                    Some(Node::pair(Node::Value(*v / 2), Node::Value(*v / 2 + *v % 2)))
+                    Some(Node::pair(
+                        Node::Value(*v / 2),
+                        Node::Value(*v / 2 + *v % 2),
+                    ))
                 } else {
                     None
                 }
@@ -197,14 +223,8 @@ mod tests {
     fn test_parse() {
         let actual = "[[8,10],[9,7]]".parse::<Node>().unwrap();
         let expected = Node::pair(
-            Node::pair(
-                Node::Value(8),
-                Node::Value(10),
-            ),
-            Node::pair(
-                Node::Value(9),
-                Node::Value(7),
-            ),
+            Node::pair(Node::Value(8), Node::Value(10)),
+            Node::pair(Node::Value(9), Node::Value(7)),
         );
         assert_eq!(expected, actual);
     }
@@ -228,7 +248,9 @@ mod tests {
             Some("[[[[0,7],4],[[7,8],[0,13]]],[1,1]]".parse::<Node>()?),
         );
         assert_eq!(
-            "[[[[0,7],4],[[7,8],[0,13]]],[1,1]]".parse::<Node>()?.split(),
+            "[[[[0,7],4],[[7,8],[0,13]]],[1,1]]"
+                .parse::<Node>()?
+                .split(),
             Some("[[[[0,7],4],[[7,8],[0,[6,7]]]],[1,1]]".parse::<Node>()?),
         );
         Ok(())
@@ -250,11 +272,15 @@ mod tests {
         );
         assert_eq!(
             Some("[[3,[2,[8,0]]],[9,[5,[4,[3,2]]]]]".parse::<Node>()?),
-            "[[3,[2,[1,[7,3]]]],[6,[5,[4,[3,2]]]]]".parse::<Node>()?.explode(),
+            "[[3,[2,[1,[7,3]]]],[6,[5,[4,[3,2]]]]]"
+                .parse::<Node>()?
+                .explode(),
         );
         assert_eq!(
             Some("[[3,[2,[8,0]]],[9,[5,[7,0]]]]".parse::<Node>()?),
-            "[[3,[2,[8,0]]],[9,[5,[4,[3,2]]]]]".parse::<Node>()?.explode(),
+            "[[3,[2,[8,0]]],[9,[5,[4,[3,2]]]]]"
+                .parse::<Node>()?
+                .explode(),
         );
         Ok(())
     }
@@ -330,7 +356,9 @@ mod tests {
                 "[[9,3],[[9,9],[6,[4,9]]]]".parse::<Node>()?,
                 "[[2,[[7,7],7]],[[5,8],[[9,3],[0,2]]]]".parse::<Node>()?,
                 "[[[[5,2],5],[8,[3,7]]],[[5,[7,5]],[4,4]]]".parse::<Node>()?,
-            ]).unwrap().magnitude(),
+            ])
+            .unwrap()
+            .magnitude(),
             4140,
         );
         Ok(())

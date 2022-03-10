@@ -25,10 +25,17 @@ fn read_input() -> Input {
     let contents = fs::read_to_string(filename).unwrap();
 
     let mut lines = contents.lines();
-    let enhancement = lines.next().unwrap().chars().map(|c| c == '#').collect_vec();
+    let enhancement = lines
+        .next()
+        .unwrap()
+        .chars()
+        .map(|c| c == '#')
+        .collect_vec();
     lines.next().unwrap();
 
-    let values = lines.map(|line| line.chars().map(|c| c == '#').collect_vec()).collect_vec();
+    let values = lines
+        .map(|line| line.chars().map(|c| c == '#').collect_vec())
+        .collect_vec();
     let num_rows = values.len();
     let num_cols = values[0].len();
     let image = Grid::new(values, num_rows, num_cols);
@@ -66,10 +73,19 @@ fn part2(input: &Input) -> Option<usize> {
 
 fn enhance(image: &Image, enhancement: &Vec<bool>, default: usize) -> Image {
     let expand = 1;
-    let mut new_image = Grid::new(vec![vec![false; image.num_cols + 2 * expand]; image.num_rows + 2 * expand], image.num_rows + 2 * expand, image.num_cols + 2 * expand);
+    let mut new_image = Grid::new(
+        vec![vec![false; image.num_cols + 2 * expand]; image.num_rows + 2 * expand],
+        image.num_rows + 2 * expand,
+        image.num_cols + 2 * expand,
+    );
     for r in 0..image.num_rows + 2 * expand {
         for c in 0..image.num_cols + 2 * expand {
-            let value = read(image, r as isize - expand as isize, c as isize - expand as isize, default);
+            let value = read(
+                image,
+                r as isize - expand as isize,
+                c as isize - expand as isize,
+                default,
+            );
             let new_value = enhancement[value as usize];
             // println!("position={:?} value={}", (r, c), value);
             new_image[&Position::new(r, c)] = new_value
@@ -98,7 +114,14 @@ fn read(image: &Image, row: isize, col: isize, default: usize) -> usize {
 fn display(image: &Image) {
     for r in 0..image.num_rows {
         for c in 0..image.num_cols {
-            print!("{}", if image[&Position::new(r, c)] { '#' } else { '.' });
+            print!(
+                "{}",
+                if image[&Position::new(r, c)] {
+                    '#'
+                } else {
+                    '.'
+                }
+            );
         }
         println!();
     }

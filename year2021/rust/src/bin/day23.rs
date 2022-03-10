@@ -12,11 +12,7 @@ use regex::internal::Char;
 use year2021::search::{HasNeighbors, SearchNode};
 
 fn abs_diff(a: usize, b: usize) -> usize {
-    return if a > b {
-        a - b
-    } else {
-        b - a
-    };
+    return if a > b { a - b } else { b - a };
 }
 
 #[derive(Copy, Clone, PartialEq, Eq, Hash, Debug)]
@@ -42,14 +38,18 @@ struct Room {
 impl Room {
     fn complete(&self) -> bool {
         for d in 0..self.spaces.len() {
-            if self.spaces[d] != Some(self.amphipod) { return false; }
+            if self.spaces[d] != Some(self.amphipod) {
+                return false;
+            }
         }
         return true;
     }
 
     fn partial(&self) -> bool {
         for d in 0..self.spaces.len() {
-            if self.spaces[d] != Some(self.amphipod) && self.spaces[d] != None { return false; }
+            if self.spaces[d] != Some(self.amphipod) && self.spaces[d] != None {
+                return false;
+            }
         }
         return true;
     }
@@ -57,7 +57,12 @@ impl Room {
 
 impl Amphipod {
     fn iterator() -> Iter<'static, Amphipod> {
-        static DIRECTIONS: [Amphipod; 4] = [Amphipod::Amber, Amphipod::Bronze, Amphipod::Copper, Amphipod::Desert];
+        static DIRECTIONS: [Amphipod; 4] = [
+            Amphipod::Amber,
+            Amphipod::Bronze,
+            Amphipod::Copper,
+            Amphipod::Desert,
+        ];
         DIRECTIONS.iter()
     }
 
@@ -67,7 +72,7 @@ impl Amphipod {
             'B' => Some(Amphipod::Bronze),
             'C' => Some(Amphipod::Copper),
             'D' => Some(Amphipod::Desert),
-            _ => None
+            _ => None,
         };
     }
 
@@ -112,15 +117,26 @@ fn main() {
 fn read_input(file: &str) -> Input {
     let filename = file;
     let contents = fs::read_to_string(filename).unwrap();
-    let input = contents.lines().map(|line| line.chars().collect_vec()).collect_vec();
+    let input = contents
+        .lines()
+        .map(|line| line.chars().collect_vec())
+        .collect_vec();
 
     let mut hallway = [None; 13];
     for c in 0..input[1].len() {
         hallway[c] = Amphipod::parse(input[1][c]);
     }
 
-    let mut rooms = [Amphipod::Amber, Amphipod::Bronze, Amphipod::Copper, Amphipod::Desert]
-        .map(|a| Room { amphipod: a, spaces: [None; 4] });
+    let mut rooms = [
+        Amphipod::Amber,
+        Amphipod::Bronze,
+        Amphipod::Copper,
+        Amphipod::Desert,
+    ]
+    .map(|a| Room {
+        amphipod: a,
+        spaces: [None; 4],
+    });
     for room in &mut rooms {
         let c = room.amphipod.target_column();
         for r in [2, 3, 4, 5] {
@@ -190,7 +206,8 @@ impl Node {
                         trapped = true;
                         dist += (depth + 1) * amphipod.movement_cost(); // move out
                         dist += (depth + 1) * room.amphipod.movement_cost(); // something needs to move in
-                        dist += abs_diff(room.amphipod.target_column(), amphipod.target_column()) * amphipod.movement_cost(); // move laterally
+                        dist += abs_diff(room.amphipod.target_column(), amphipod.target_column())
+                            * amphipod.movement_cost(); // move laterally
                     } else if trapped {
                         dist += 2 * (depth + 1) * amphipod.movement_cost(); // move out and back in
                         dist += 2 * amphipod.movement_cost(); // move out of the way
@@ -203,7 +220,8 @@ impl Node {
 
         for column in 0..state.hallway.len() {
             if let Some(amphipod) = state.hallway[column] {
-                dist += abs_diff(column, amphipod.target_column()) * amphipod.movement_cost(); // move laterally
+                dist += abs_diff(column, amphipod.target_column()) * amphipod.movement_cost();
+                // move laterally
             }
         }
 
@@ -225,7 +243,11 @@ impl PartialOrd for Node {
 
 impl Display for Burrow {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        fn write_space(f: &mut Formatter<'_>, amphipod: &Option<Amphipod>, default: &str) -> std::fmt::Result {
+        fn write_space(
+            f: &mut Formatter<'_>,
+            amphipod: &Option<Amphipod>,
+            default: &str,
+        ) -> std::fmt::Result {
             return if let Some(amphipod) = &amphipod {
                 write!(f, "{}", amphipod)
             } else {
@@ -286,7 +308,6 @@ impl Display for Burrow {
     }
 }
 
-
 impl Display for Amphipod {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         return match self {
@@ -307,7 +328,9 @@ impl HasNeighbors for Burrow {
 impl Burrow {
     fn complete(&self) -> bool {
         for room in self.rooms {
-            if !room.complete() { return false; }
+            if !room.complete() {
+                return false;
+            }
         }
         return true;
     }
@@ -328,7 +351,11 @@ impl Burrow {
                                 let mut new_state = self.clone();
                                 new_state.hallway[end_c] = Some(amphipod);
                                 new_state.rooms[column.room_index()].spaces[depth] = None;
-                                possible.push((new_state, (depth + 1 + abs_diff(end_c, start_c)) * amphipod.movement_cost()));
+                                possible.push((
+                                    new_state,
+                                    (depth + 1 + abs_diff(end_c, start_c))
+                                        * amphipod.movement_cost(),
+                                ));
                             }
                         }
 
@@ -348,8 +375,13 @@ impl Burrow {
                         if target_room.spaces[end_depth] == None {
                             let mut new_state = self.clone();
                             new_state.hallway[start_c] = None;
-                            new_state.rooms[amphipod.room_index()].spaces[end_depth] = Some(amphipod);
-                            possible.push((new_state, (end_depth + 1 + abs_diff(end_c, start_c)) * amphipod.movement_cost()));
+                            new_state.rooms[amphipod.room_index()].spaces[end_depth] =
+                                Some(amphipod);
+                            possible.push((
+                                new_state,
+                                (end_depth + 1 + abs_diff(end_c, start_c))
+                                    * amphipod.movement_cost(),
+                            ));
                             break; // must always move to the bottom
                         } else if let Some(neighbor) = target_room.spaces[end_depth] {
                             if neighbor != amphipod {
@@ -366,9 +398,13 @@ impl Burrow {
 
     fn hallway_blocked(&self, start_c: usize, end_c: usize) -> bool {
         for c in min(start_c, end_c) + 1..=max(start_c, end_c) - 1 {
-            if &self.hallway[c] != &None { return true; }
+            if &self.hallway[c] != &None {
+                return true;
+            }
         }
-        if &self.hallway[end_c] != &None { return true; }
+        if &self.hallway[end_c] != &None {
+            return true;
+        }
         return false;
     }
 }
