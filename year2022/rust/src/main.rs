@@ -28,6 +28,8 @@ fn main() {
             "1b" => Some(day01::part2()),
             "2a" => Some(day02::part1()),
             "2b" => Some(day02::part2()),
+            "3a" => Some(day03::part1()),
+            "3b" => Some(day03::part2()),
             _ => None,
         };
         println!(
