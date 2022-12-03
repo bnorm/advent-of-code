@@ -34,4 +34,3 @@ fn parse_sections<'a, F>(
                 .map(|line| { line.parse::<F>().unwrap() })
         });
 }
-

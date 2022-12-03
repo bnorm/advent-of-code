@@ -26,6 +26,8 @@ fn main() {
         let result = match part.as_ref() {
             "1a" => Some(day01::part1()),
             "1b" => Some(day01::part2()),
+            "2a" => Some(day02::part1()),
+            "2b" => Some(day02::part2()),
             _ => None,
         };
         println!(

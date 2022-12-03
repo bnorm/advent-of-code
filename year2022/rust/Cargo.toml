@@ -4,12 +4,12 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-clap = { version = "3.0.0-rc.7", features = ["derive"] }
+clap = { version = "3.2.23", features = ["derive"] }
 #itertools = "0.10.1"
 #regex = "1.5.4"
 #lazy_static = "1.4.0"
-#recap = "0.1.1"
-#serde = "1.0.130"
+recap = "0.1.2"
+serde = "1.0.130"
 #hex = "0.4.3"
 #bitstream-io = "1.2.0"
 
