@@ -8,19 +8,17 @@ pub struct Grid<T> {
 }
 
 impl<T> Grid<T> {
-    pub fn new(values: Vec<Vec<T>>, num_rows: usize, num_cols: usize) -> Self {
-        return Grid {
-            values,
-            num_rows,
-            num_cols,
-        };
+    pub fn new(values: Vec<Vec<T>>) -> Self {
+        let num_rows = values.len();
+        let num_cols = if num_rows == 0 { 0 } else { values[0].len() };
+        return Grid { values, num_rows, num_cols };
     }
 
     pub fn contains(&self, position: &Position) -> bool {
         return position.row < self.num_rows && position.col < self.num_cols;
     }
 
-    pub fn iter(&self) -> impl Iterator<Item = &T> + '_ {
+    pub fn iter(&self) -> impl Iterator<Item=&T> + '_ {
         return self.values.iter().flat_map(|row| row.iter());
     }
 }
@@ -36,30 +34,37 @@ impl Position {
         Position { row, col }
     }
 
-    pub fn neighbours(&self, num_rows: usize, num_cols: usize) -> Vec<Position> {
-        let mut result = Vec::new();
+    pub fn neighbors(&self, num_rows: usize, num_cols: usize) -> impl Iterator<Item=Position> + '_ {
+        let mut num = 0;
+        return std::iter::from_fn(move || {
+            loop {
+                num += 1;
+                match num {
+                    // Up
+                    1 => if self.row > 0 {
+                        return Some(Position::new(self.row - 1, self.col))
+                    },
 
-        // Up
-        if self.row > 0 {
-            result.push(Position::new(self.row - 1, self.col));
-        }
+                    // Down
+                    2 => if self.row < num_rows - 1 {
+                        return Some(Position::new(self.row + 1, self.col))
+                    },
 
-        // Down
-        if self.row < num_rows - 1 {
-            result.push(Position::new(self.row + 1, self.col));
-        }
+                    // Left
+                    3 => if self.col > 0 {
+                        return Some(Position::new(self.row, self.col - 1))
+                    },
 
-        // Left
-        if self.col > 0 {
-            result.push(Position::new(self.row, self.col - 1));
-        }
+                    // Right
+                    4 => if self.col < num_cols - 1 {
+                        return Some(Position::new(self.row, self.col + 1))
+                    },
 
-        // Right
-        if self.col < num_cols - 1 {
-            result.push(Position::new(self.row, self.col + 1));
-        }
-
-        return result;
+                    // Exit
+                    _ => return None
+                }
+            }
+        });
     }
 }
 

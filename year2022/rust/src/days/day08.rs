@@ -10,10 +10,8 @@ pub fn part1() -> String {
                 .collect::<Vec<_>>()
         })
         .collect::<Vec<_>>();
-    let num_rows = grid.len();
-    let num_cols = grid[0].len();
 
-    let count = count(&Grid::new(grid, num_rows, num_cols));
+    let count = count(&Grid::new(grid));
 
     return format!("{:?}", count);
 }
@@ -28,10 +26,8 @@ pub fn part2() -> String {
                 .collect::<Vec<_>>()
         })
         .collect::<Vec<_>>();
-    let num_rows = grid.len();
-    let num_cols = grid[0].len();
 
-    let scenic = most_scenic(&Grid::new(grid, num_rows, num_cols));
+    let scenic = most_scenic(&Grid::new(grid));
 
     return format!("{:?}", scenic);
 }
