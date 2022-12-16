@@ -1,26 +1,26 @@
+use std::collections::HashSet;
 use std::ops::RangeInclusive;
 
 use recap::Recap;
 use serde::Deserialize;
 
 pub fn part1() -> String {
+    let y = 2000000;
     let readings = include_str!("res/input15.txt")
         .lines()
         .map(|line| SensorReading::new(line.parse::<SensorReadingInput>().unwrap()))
         .collect::<Vec<_>>();
 
-    let y = 2000000;
-    let min_x = readings.iter().fold(0, |acc, r| acc.min(r.sensor_x - r.line_width(y)));
-    let max_x = readings.iter().fold(0, |acc, r| acc.max(r.sensor_x + r.line_width(y)));
+    // Calculate sensor ranges and count of spaces
+    let ranges = ranges_union(&readings.iter().filter_map(|r| r.line_range(y)).collect::<Vec<_>>());
+    let mut count = ranges.iter().fold(0 as isize, |acc, r| acc + (r.end() - r.start() + 1));
 
-    let mut count = 0;
-    for x in min_x..=max_x {
-        let is_beacon = readings.iter().fold(false, |acc, r| acc || is_beacon(x, y, r));
-        let possible_beacon = readings.iter().fold(true, |acc, r| acc && possible_beacon(x, y, r));
-        if !is_beacon && !possible_beacon {
-            count += 1;
-        }
-    }
+    // Remove beacons which are on that row
+    count -= readings.iter()
+        .map(|r| (r.beacon_x, r.beacon_y))
+        .collect::<HashSet<_>>().iter()
+        .filter(|(_, beacon_y)| *beacon_y == y)
+        .count() as isize;
 
     return format!("{:?}", count);
 }
@@ -31,7 +31,7 @@ pub fn part2() -> String {
         .map(|line| SensorReading::new(line.parse::<SensorReadingInput>().unwrap()))
         .collect::<Vec<_>>();
 
-    let (x, y) = find_beacon(&readings);
+    let (x, y) = find_beacon(&readings, 4_000_000);
     return format!("{:?}", x * 4_000_000 + y);
 }
 
@@ -63,14 +63,8 @@ impl SensorReading {
         };
     }
 
-    fn line_width(&self, y: isize) -> isize {
-        let line_dist = (self.sensor_y - y).abs();
-        return (self.beacon_dist - line_dist).max(0);
-    }
-
     fn line_range(&self, y: isize) -> Option<RangeInclusive<isize>> {
-        let line_dist = (self.sensor_y - y).abs();
-        let width = self.beacon_dist - line_dist;
+        let width = self.beacon_dist - (self.sensor_y - y).abs();
         return if width <= 0 {
             None
         } else {
@@ -79,16 +73,16 @@ impl SensorReading {
     }
 }
 
-fn find_beacon(readings: &Vec<SensorReading>) -> (isize, isize) {
-    for y in 0..=4_000_000 {
-        let mut ranges = vec![0..=4_000_000];
+fn find_beacon(readings: &Vec<SensorReading>, max: isize) -> (isize, isize) {
+    for y in 0..=max {
+        let mut ranges = vec![0..=max];
         for reading in readings {
             let cut = match reading.line_range(y) {
                 Some(it) => it,
                 None => continue,
             };
 
-            ranges = dissect_range(&ranges, &cut);
+            ranges = range_dissection(&ranges, &cut);
             if ranges.len() == 0 {
                 break
             }
@@ -104,10 +98,9 @@ fn find_beacon(readings: &Vec<SensorReading>) -> (isize, isize) {
     panic!();
 }
 
-fn dissect_range(original: &Vec<RangeInclusive<isize>>, cut: &RangeInclusive<isize>) -> Vec<RangeInclusive<isize>> {
+fn range_dissection(ranges: &Vec<RangeInclusive<isize>>, cut: &RangeInclusive<isize>) -> Vec<RangeInclusive<isize>> {
     let mut new = Vec::<RangeInclusive<isize>>::new();
-
-    for range in original {
+    for range in ranges {
         if range.contains(cut.start()) {
             new.push(*range.start()..=*cut.start() - 1);
         }
@@ -118,17 +111,56 @@ fn dissect_range(original: &Vec<RangeInclusive<isize>>, cut: &RangeInclusive<isi
             new.push(range.clone());
         }
     }
-
     return new;
 }
 
-fn possible_beacon(x: isize, y: isize, reading: &SensorReading) -> bool {
-    if x == reading.beacon_x && y == reading.beacon_y { return false; }
-
-    let point_dist = (reading.sensor_x - x).abs() + (reading.sensor_y - y).abs();
-    return point_dist > reading.beacon_dist;
+fn range_union(range: &RangeInclusive<isize>, cut: &RangeInclusive<isize>) -> Option<RangeInclusive<isize>> {
+    if range.contains(cut.start()) {
+        if range.contains(cut.end()) {
+            return Some(range.clone())
+        } else {
+            return Some(*range.start()..=*cut.end())
+        }
+    }
+    if cut.contains(range.start()) {
+        if cut.contains(range.end()) {
+            return Some(cut.clone())
+        } else {
+            return Some(*cut.start()..=*range.end())
+        }
+    }
+    if range.end() + 1 == *cut.start() {
+        return Some(*range.start()..=*cut.end())
+    }
+    if cut.end() + 1 == *range.start() {
+        return Some(*cut.start()..=*range.end())
+    }
+    return None
 }
 
-fn is_beacon(x: isize, y: isize, reading: &SensorReading) -> bool {
-    return x == reading.beacon_x && y == reading.beacon_y;
+fn ranges_union(range: &Vec<RangeInclusive<isize>>) -> Vec<RangeInclusive<isize>> {
+    let mut sorted = Vec::from_iter(range.iter());
+    sorted.sort_by(|a, b| a.start().cmp(b.start()));
+
+    let mut union = Vec::<RangeInclusive<isize>>::new();
+    let mut iter = sorted.iter();
+    let mut current = match iter.next() {
+        None => return union,
+        Some(&it) => it.clone(),
+    };
+
+    while let Some(&it) = iter.next() {
+        match range_union(&current, it) {
+            None => {
+                union.push(current.clone());
+                current = it.clone();
+            },
+            Some(it) => {
+                current = it
+            }
+        }
+    }
+
+    union.push(current);
+    return union;
 }
