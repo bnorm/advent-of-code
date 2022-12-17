@@ -18,37 +18,64 @@ pub fn part1() -> String {
 }
 
 pub fn part2() -> String {
-    // let wind = include_str!("res/input17.txt").lines().collect::<Vec<_>>()[0].chars().collect::<Vec<_>>();
-    // let rocks = vec![Rock::Horizontal, Rock::Plus, Rock::Corner, Rock::Vertical, Rock::Box];
+    let wind = include_str!("res/input17.txt").lines().collect::<Vec<_>>()[0].chars().collect::<Vec<_>>();
+    let rocks = vec![Rock::Horizontal, Rock::Plus, Rock::Corner, Rock::Vertical, Rock::Box];
 
-    // Numbers determined by manually parsing height increase per rocks.len()
-    let startup: Vec<usize> = vec![13, 10, 5, 5, 6, 9, 6, 8, 7, 8, 10, 9, 5, 6, 10, 5, 7, 6, 10, 7, 11, 10, 8, 6, 8, 6, 8, 4, 5, 7, 6, 6, 7, 5, 9, 8, 11, 9, 7, 11, 7, 7, 9, 9, 10, 1, 8, 7, 7, 10, 3, 7];
-    let repeat: Vec<usize> = vec![7, 8, 10, 7, 7, 11, 7, 6, 4, 9, 5, 6, 9, 11, 9, 9, 5, 9, 8, 4, 5, 8, 10, 7, 11, 11, 6, 10, 9, 11, 13, 7, 8, 8, 6, 6, 12, 9, 7, 6, 9, 8, 7, 7, 8, 6, 5, 6, 10, 4, 7, 8, 8, 9, 6, 7, 9, 8, 8, 7, 4, 7, 7, 10, 8, 3, 4, 9, 7, 9, 9, 9, 6, 10, 9, 8, 7, 7, 5, 10, 8, 6, 7, 7, 8, 11, 11, 9, 8, 5, 9, 11, 9, 3, 7, 9, 2, 4, 9, 4, 7, 8, 10, 7, 8, 8, 11, 6, 4, 6, 6, 8, 7, 7, 8, 10, 9, 7, 8, 6, 9, 6, 6, 9, 6, 5, 10, 8, 11, 3, 6, 6, 4, 13, 6, 7, 8, 6, 5, 5, 8, 4, 6, 6, 8, 8, 7, 13, 7, 8, 10, 6, 9, 7, 6, 9, 7, 7, 10, 10, 6, 7, 9, 9, 7, 9, 8, 8, 9, 8, 7, 6, 8, 7, 9, 6, 7, 8, 7, 9, 8, 4, 7, 6, 9, 9, 5, 9, 7, 7, 5, 7, 13, 12, 8, 8, 4, 12, 6, 8, 7, 9, 3, 7, 7, 8, 3, 7, 9, 7, 9, 4, 6, 7, 7, 10, 9, 5, 7, 9, 10, 10, 10, 7, 12, 6, 8, 5, 6, 6, 11, 10, 9, 10, 11, 5, 7, 10, 6, 9, 7, 6, 4, 9, 9, 9, 8, 7, 8, 8, 7, 13, 8, 9, 6, 5, 9, 8, 11, 9, 8, 11, 9, 8, 9, 8, 6, 7, 7, 10, 5, 7, 5, 11, 5, 9, 7, 4, 3, 5, 12, 6, 6, 9, 7, 9, 9, 7, 9, 7, 7, 6, 9, 7, 6, 6, 12, 8, 11, 3, 10, 11, 12, 6, 5, 7, 5, 6, 10, 5, 6, 7, 7, 5, 10, 8, 8, 10, 7, 8, 10, 9, 7, 6, 5, 7, 7, 7, 9, 11, 9, 6, 7, 9, 6, 7, 9, 8, 7, 7, 6, 9, 11, 11, 11, 8];
-    let startup_height: usize = startup.iter().sum();
-    let repeat_height: usize = repeat.iter().sum();
+    let (startup, cycle) = find_cycle(&rocks, &wind);
 
-    let mut height: usize = 0;
-    let mut rocks: usize = 1000000000000;
+    let mut height = 0;
+    let mut rock_count = 1000000000000;
 
-    rocks -= 5 * startup.len();
-    height += startup_height;
+    rock_count -= rocks.len() * startup.len();
+    height += startup.iter().sum::<usize>();
 
-    let repeat_count = rocks / (5 * repeat.len());
-    rocks = rocks % (5 * repeat.len());
-    height += repeat_count * repeat_height;
+    let cycle_count = rock_count / (rocks.len() * cycle.len());
+    rock_count = rock_count % (rocks.len() * cycle.len());
+    height += cycle_count * cycle.iter().sum::<usize>();
 
-    if rocks % 5 != 0 {
-        panic!();
-    }
-
-    let mut repeat_iter = repeat.iter();
-    while rocks > 0 {
-        let h = repeat_iter.next().unwrap();
-        height += h;
-        rocks -= 5;
+    let mut cycle_iter = cycle.iter();
+    while rock_count > 0 {
+        height += cycle_iter.next().unwrap();
+        rock_count -= rocks.len();
     }
 
     return format!("{:?}", height);
+}
+
+fn find_cycle(rocks: &Vec<Rock>, wind: &Vec<char>) -> (Vec<usize>, Vec<usize>) {
+    let mut wind_iterator = infinite_iterator(&wind);
+    let mut rock_iterator = infinite_iterator(&rocks);
+
+    let mut rock_cycle_heights = Vec::<usize>::new();
+
+    let mut startup = Vec::<usize>::new();
+    let mut cycle = Vec::<usize>::new();
+
+    let mut chamber = Chamber::new();
+    let mut rock_count = 0;
+    let mut last_height = 0;
+    loop {
+        chamber.drop(rock_iterator.next().unwrap(), &mut wind_iterator);
+        rock_count += 1;
+        if rock_count % rocks.len() == 0 {
+            rock_cycle_heights.push(chamber.height - last_height);
+            last_height = chamber.height;
+
+            // Guess that the cycle must be greater in size than 10 (trial and error...)
+            for repeat_size in 10..rock_cycle_heights.len() / 2 {
+                let (left, right) = rock_cycle_heights.split_at(rock_cycle_heights.len() - repeat_size);
+                if left.ends_with(right) {
+                    for r in right {
+                        cycle.push(*r);
+                    }
+                    for i in 0..left.len() - right.len() {
+                        startup.push(left[i]);
+                    }
+                    return (startup, cycle);
+                }
+            }
+        }
+    }
 }
 
 fn infinite_iterator<'a, T>(source: &'a Vec<T>) -> impl Iterator<Item=&'a T> + 'a {
