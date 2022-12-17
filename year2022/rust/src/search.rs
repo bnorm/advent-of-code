@@ -5,54 +5,57 @@ use std::hash::Hash;
 #[derive(Debug, PartialEq, Eq)]
 pub struct SearchNode<T> {
     pub value: T,
-    pub cost: usize,
-    pub distance: usize,
+    pub cost: isize,
+    pub distance: isize,
 }
 
 impl<T> SearchNode<T> {
-    pub fn new(cost: usize, distance: usize, value: T) -> Self {
+    pub fn new(cost: isize, distance: isize, value: T) -> Self {
         return SearchNode { value, cost, distance };
     }
 }
 
 impl<T: Eq + PartialEq> Ord for SearchNode<T> {
     fn cmp(&self, other: &Self) -> Ordering {
-        (other.cost + other.distance).cmp(&(self.cost + other.distance))
+        // Reversed to be min-heap
+        (other.cost + other.distance).cmp(&(self.cost + self.distance))
     }
 }
 
 impl<T: PartialEq> PartialOrd for SearchNode<T> {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some((other.cost + other.distance).cmp(&(self.cost + other.distance)))
+        // Reversed to be min-heap
+        Some((other.cost + other.distance).cmp(&(self.cost + self.distance)))
     }
 }
 
 pub fn search<T, F>(
     start: SearchNode<T>,
-    neighbors: F,
-) -> Option<usize>
+    mut neighbors: F,
+) -> Option<SearchNode<T>>
     where T: Hash + Eq,
-          F: Fn(&SearchNode<T>) -> Vec<SearchNode<T>>
+          F: FnMut(&SearchNode<T>) -> Vec<SearchNode<T>>
 {
-    let mut seen = HashMap::<T, usize>::new();
+    let mut seen = HashMap::<T, isize>::new();
     let mut search = BinaryHeap::<SearchNode<T>>::new();
     search.push(start);
 
     while let Some(node) = search.pop() {
-        if seen.contains_key(&node.value) {
-            // The first time we see a node will always be the cheapest ???
+        if seen.contains_key(&node.value) && seen[&node.value] <= node.cost + node.distance {
+            // We've seen the node before and it cost less before
             continue
         }
 
         if node.distance == 0 {
-            return Some(node.cost);
+            return Some(node);
         }
 
-        for neighbor in neighbors(&node) {
+        let neighbors = neighbors(&node);
+        seen.insert(node.value,  node.cost + node.distance);
+
+        for neighbor in neighbors {
             search.push(neighbor);
         }
-
-        seen.insert(node.value, node.cost);
     }
 
     return None;

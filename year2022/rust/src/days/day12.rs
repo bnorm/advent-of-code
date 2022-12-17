@@ -10,9 +10,9 @@ pub fn part1() -> String {
     let start = find_char(&grid, 'S').unwrap();
     let end = find_char(&grid, 'E').unwrap();
     let distance_fn = |position: Position| {
-        abs_diff(position.row, end.row) + abs_diff(position.col, end.col)
+        (abs_diff(position.row, end.row) + abs_diff(position.col, end.col)) as isize
     };
-    let cost_fn = |node: &SearchNode<_>| { node.cost + 1 };
+    let cost_fn = |node: &SearchNode<_>| { (node.cost + 1) as isize };
 
     let start_node = SearchNode::new(0, distance_fn(start), Location::new(start, &grid));
     let cost = search(start_node, |node| {
@@ -21,7 +21,7 @@ pub fn part1() -> String {
             .filter(|l| l.height as isize - node.value.height as isize <= 1)
             .map(|l| { SearchNode::new(cost_fn(node), distance_fn(l.position), l) })
             .collect()
-    }).unwrap();
+    }).unwrap().cost;
 
     return format!("{:?}", cost);
 }
@@ -33,8 +33,8 @@ pub fn part2() -> String {
 
     let grid = Grid::new(input);
     let end = find_char(&grid, 'E').unwrap();
-    let distance_fn = |location: Location| { location.height };
-    let cost_fn = |node: &SearchNode<_>| { node.cost + 1 };
+    let distance_fn = |location: Location| { location.height as isize };
+    let cost_fn = |node: &SearchNode<_>| { (node.cost + 1) as isize };
 
     let end_location = Location::new(end, &grid);
     let start_node = SearchNode::new(0, distance_fn(end_location), end_location);
@@ -44,7 +44,7 @@ pub fn part2() -> String {
             .filter(|l| l.height as isize - node.value.height as isize >= -1)
             .map(|l| { SearchNode::new(cost_fn(node), distance_fn(l), l) })
             .collect()
-    }).unwrap();
+    }).unwrap().cost;
 
     return format!("{:?}", cost);
 }
