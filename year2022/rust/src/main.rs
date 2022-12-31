@@ -16,13 +16,20 @@ fn main() {
 
     if args.parts.is_empty() {
         let mut app: App = Cli::into_app();
-        app.error(
-            ErrorKind::MissingRequiredArgument,
-            "Most provide at least one part",
-        )
-        .exit();
+        app.error(ErrorKind::MissingRequiredArgument, "Most provide at least one part").exit();
     }
-    for part in args.parts {
+
+    let mut parts = args.parts.clone();
+    if parts.contains(&"all".to_string()) {
+        parts = vec!["1a", "1b", "2a", "2b", "3a", "3b", "4a", "4b", "5a", "5b", "6a", "6b", "7a", "7b",
+                     "8a", "8b", "9a", "9b", "10a", "10b", "11a", "11b", "12a", "12b", "13a", "13b",
+                     "14a", "14b", "15a", "15b", "16a", "16b", "17a", "17b", "18a", "18b", "19a", "19b",
+                     "20a", "20b", "21a", "21b", "22a", "22b", "23a", "23b", "24a", "24b", "25a", "25b"]
+            .iter().map(|s| s.to_string())
+            .collect();
+    }
+
+    for part in parts {
         let result = match part.as_ref() {
             "1a" => Some(day01::part1()),
             "1b" => Some(day01::part2()),
@@ -76,10 +83,6 @@ fn main() {
             "25b" => Some(day25::part2()),
             _ => None,
         };
-        println!(
-            "[{}] result: {}",
-            part,
-            result.unwrap_or(String::from("UNKNOWN"))
-        );
+        println!("[{}] result: {}", part, result.unwrap_or("UNKNOWN".to_string()));
     }
 }
