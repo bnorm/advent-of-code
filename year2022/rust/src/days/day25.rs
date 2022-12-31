@@ -5,11 +5,6 @@ pub fn part1() -> String {
     return format!("{:?}", encode(sum));
 }
 
-pub fn part2() -> String {
-    let _input = include_str!("res/input25.txt").lines().collect::<Vec<_>>();
-    return format!("{:?}", 0);
-}
-
 fn decode(input: &str) -> isize {
     let mut value = 0;
     let mut multiple = 1;
