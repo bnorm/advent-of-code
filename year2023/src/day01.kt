@@ -1,3 +1,7 @@
+package day01
+
+import utils.*
+
 fun main() {
     val sample1 = readInput("day01.sample1.txt")
     val sample2 = readInput("day01.sample2.txt")

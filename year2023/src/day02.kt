@@ -1,3 +1,7 @@
+package day02
+
+import utils.*
+
 fun main() {
     val sample1 = readInput("day02.sample1.txt")
     val sample2 = readInput("day02.sample2.txt")
@@ -23,7 +27,7 @@ private fun part2(input: List<String>): String {
         .toString()
 }
 
-data class CubeSet(
+private data class CubeSet(
     val red: Int,
     val green: Int,
     val blue: Int,
@@ -35,7 +39,7 @@ data class CubeSet(
     }
 }
 
-data class Game(
+private data class Game(
     val id: Int,
     val handfuls: List<CubeSet>,
 ) {
