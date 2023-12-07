@@ -14,3 +14,10 @@ fun readInput(fileName: String): List<String> {
 inline operator fun <T : Any> MutableCollection<in T>.plusAssign(element: T?) {
     if (element != null) this.add(element)
 }
+
+fun <T> compareEachBy(a: List<T>, b: List<T>, selector: (T) -> Comparable<*>?): Int {
+    for (i in 0..<minOf(a.size, b.size)) {
+        compareValuesBy(a[i], b[i], selector).let { if (it != 0) return it }
+    }
+    return compareValues(a.size, b.size)
+}
