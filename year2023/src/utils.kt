@@ -15,6 +15,17 @@ inline operator fun <T : Any> MutableCollection<in T>.plusAssign(element: T?) {
     if (element != null) this.add(element)
 }
 
+fun lcm(a: Long, b: Long): Long {
+    val step = maxOf(a, b)
+    val maxLcm = a * b
+    var lcm = step
+    while (lcm <= maxLcm) {
+        if (lcm % a == 0L && lcm % b == 0L) return lcm
+        lcm += step
+    }
+    return maxLcm
+}
+
 fun <T> compareEachBy(a: List<T>, b: List<T>, selector: (T) -> Comparable<*>?): Int {
     for (i in 0..<minOf(a.size, b.size)) {
         compareValuesBy(a[i], b[i], selector).let { if (it != 0) return it }
