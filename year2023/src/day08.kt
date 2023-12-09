@@ -1,5 +1,6 @@
 package day08
 
+import math.*
 import utils.*
 
 fun main() {
