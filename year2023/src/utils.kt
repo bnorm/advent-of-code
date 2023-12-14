@@ -11,6 +11,23 @@ fun readInput(fileName: String): List<String> {
     return resource.toURI().toPath().readLines()
 }
 
+fun List<String>.separateBy(predicate: (String) -> Boolean): List<List<String>> {
+    val groups = mutableListOf<List<String>>()
+    val group = mutableListOf<String>()
+    for (line in this) {
+        if (predicate(line)) {
+            if (group.isNotEmpty()) {
+                groups.add(group.toList())
+                group.clear()
+            }
+        } else {
+            group.add(line)
+        }
+    }
+    if (group.isNotEmpty()) groups.add(group.toList())
+    return groups
+}
+
 inline operator fun <T : Any> MutableCollection<in T>.plusAssign(element: T?) {
     if (element != null) this.add(element)
 }
