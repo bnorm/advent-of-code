@@ -21,3 +21,16 @@ fun <T> compareEachBy(a: List<T>, b: List<T>, selector: (T) -> Comparable<*>?): 
     }
     return compareValues(a.size, b.size)
 }
+
+fun <T> List<T>.toPairs(): List<Pair<T, T>> {
+    require(this.size > 1)
+
+    val pairs = mutableListOf<Pair<T, T>>()
+    for (i in 0..<this.size - 1) {
+        for (j in i + 1..<this.size) {
+            pairs.add(this[i] to this[j])
+        }
+    }
+
+    return pairs
+}
