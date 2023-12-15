@@ -7,7 +7,6 @@ fun main() {
     val sample2 = readInput("day13.sample2.txt")
     val input = readInput("day13.txt")
 
-    // 23572
     val part1 = part1(sample1)
     require(part1 == "405") { part1 }
     println(part1(input))

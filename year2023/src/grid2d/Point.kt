@@ -35,30 +35,11 @@ fun manhattan(first: Point, second: Point): Long {
     return abs(first.x.toLong() - second.x.toLong()) + abs(first.y.toLong() - second.y.toLong())
 }
 
-
-class Grid<T>(
-    private val rows: List<List<T>>,
-) {
-    init {
-        val rowSizes = rows.map { it.size }
-        require(rowSizes.isNotEmpty()) { "Must have at least 1 row." }
-        require(rowSizes.toSet().size == 1) { "All rows must have the same length." }
-    }
-
-    val xSpan = rows[0].indices
-    val ySpan = rows.indices
-
-    fun contains(x: Int, y: Int): Boolean = x in xSpan && y in ySpan
-    private fun checkBounds(x: Int, y: Int): Unit = require(contains(x, y)) { "($x, $y) !in ($xSpan, $ySpan)" }
-
-    operator fun get(x: Int, y: Int): T {
-        checkBounds(x, y)
-        return rows[y][x]
-    }
-}
-
-operator fun <T> Grid<T>.get(point: Point): T = get(point.x, point.y)
 operator fun <T> Grid<T>.contains(point: Point): Boolean = point.x in xSpan && point.y in ySpan
+operator fun <T> Grid<T>.get(point: Point): T = get(point.x, point.y)
+operator fun <T> MutableGrid<T>.set(point: Point, value: T) = set(point.x, point.y, value)
+fun <T> Grid<T>.ref(point: Point) = ref(point.x, point.y)
+fun <T> MutableGrid<T>.ref(point: Point) = ref(point.x, point.y)
 
 fun <T> Grid<T>.findAll(predicate: (T) -> Boolean): Sequence<Point> = sequence {
     val grid = this@findAll
