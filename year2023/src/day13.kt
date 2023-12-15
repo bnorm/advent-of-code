@@ -1,5 +1,6 @@
 package day13
 
+import grid2d.Grid
 import utils.*
 
 fun main() {
@@ -17,22 +18,24 @@ fun main() {
 }
 
 fun part1(input: List<String>): String {
-    val groups = input.separateBy { it.isEmpty() }
-    return groups.sumOf { findReflection(it) }.toString()
+    val grids = input.separateBy { it.isEmpty() }
+        .map { grid -> Grid(grid.map { it.toList() }) }
+    return grids.sumOf { findReflection(it) }.toString()
 }
 
 fun part2(input: List<String>): String {
-    val groups = input.separateBy { it.isEmpty() }
-    return groups.sumOf { findDirtyReflection(it) }.toString()
+    val grids = input.separateBy { it.isEmpty() }
+        .map { grid -> Grid(grid.map { it.toList() }) }
+    return grids.sumOf { findDirtyReflection(it) }.toString()
 }
 
-fun findReflection(grid: List<String>): Int {
-    fun find(rows: List<String>): Int? {
-        rows@ for (index in 1..<rows.size) {
+fun findReflection(grid: Grid<Char>): Int {
+    fun find(spans: List<Grid.Span<Char>>): Int? {
+        rows@ for (index in 1..<spans.size) {
             var j = index - 1
             var k = index
-            while (j >= 0 && k < rows.size) {
-                if (rows[j] != rows[k]) continue@rows
+            while (j >= 0 && k < spans.size) {
+                if (spans[j] != spans[k]) continue@rows
                 k++
                 j--
             }
@@ -41,22 +44,22 @@ fun findReflection(grid: List<String>): Int {
         return null
     }
 
-    find(grid)?.let { return 100 * it }
-    find(grid.transpose())?.let { return it }
-    error("!")
+    return find(grid.ySpan.map { grid.row(it) })?.let { 100 * it }
+        ?: find(grid.xSpan.map { grid.column(it) })
+        ?: error("!")
 }
 
-fun findDirtyReflection(grid: List<String>): Int {
-    fun diff(first: String, second: String): Int =
+fun findDirtyReflection(grid: Grid<Char>): Int {
+    fun diff(first: Grid.Span<Char>, second: Grid.Span<Char>): Int =
         first.zip(second) { a, b -> if (a == b) 0 else 1 }.sum()
 
-    fun find(rows: List<String>): Int? {
-        rows@ for (index in 1..<rows.size) {
+    fun find(spans: List<Grid.Span<Char>>): Int? {
+        rows@ for (index in 1..<spans.size) {
             var j = index - 1
             var k = index
             var difference = 0
-            while (j >= 0 && k < rows.size) {
-                difference += diff(rows[j], rows[k])
+            while (j >= 0 && k < spans.size) {
+                difference += diff(spans[j], spans[k])
                 if (difference > 1) continue@rows
                 k++
                 j--
@@ -66,17 +69,7 @@ fun findDirtyReflection(grid: List<String>): Int {
         return null
     }
 
-    find(grid)?.let { return 100 * it }
-    find(grid.transpose())?.let { return it }
-    error("!")
-}
-
-fun List<String>.transpose(): List<String> {
-    val columns = mutableListOf<String>()
-
-    for (c in 0..<this[0].length) {
-        columns.add(this.map { it[c] }.joinToString(""))
-    }
-
-    return columns
+    return find(grid.ySpan.map { grid.row(it) })?.let { 100 * it }
+        ?: find(grid.xSpan.map { grid.column(it) })
+        ?: error("!")
 }
