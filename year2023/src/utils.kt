@@ -51,3 +51,21 @@ fun <T> List<T>.toPairs(): List<Pair<T, T>> {
 
     return pairs
 }
+
+fun <T> findCycleSize(items: List<T>): Int? {
+    cycleSize@ for (cycleSize in 1..<items.size / 2) {
+        var cycleStart = items.size - cycleSize
+        val right = items.subList(cycleStart, cycleStart + cycleSize)
+
+        // Repeatedly check to the beginning of the list to avoid local cycles.
+        cycleStart -= cycleSize
+        while (cycleStart > 0) {
+            val left = items.subList(cycleStart, cycleStart + cycleSize)
+            if (left != right) continue@cycleSize
+            cycleStart -= cycleSize
+        }
+
+        return cycleSize
+    }
+    return null
+}

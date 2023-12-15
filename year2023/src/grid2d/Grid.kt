@@ -64,9 +64,9 @@ class MutableGrid<T>(
         rows[y][x] = value
     }
 
-    override fun ref(x: Int, y: Int): Location<T> {
+    override fun ref(x: Int, y: Int): MutableLocation<T> {
         checkBounds(x, y)
-        return object : Location<T> {
+        return object : MutableLocation<T> {
             override var value: T
                 get() = rows[y][x]
                 set(value) {
@@ -75,54 +75,88 @@ class MutableGrid<T>(
         }
     }
 
-    override fun row(y: Int): Span<T> {
+    override fun row(y: Int): MutableSpan<T> {
         checkBounds(0, y)
         return RowSpan(y, this)
     }
 
-    override fun column(x: Int): Span<T> {
+    override fun column(x: Int): MutableSpan<T> {
         checkBounds(x, 0)
         return ColumnSpan(x, this)
     }
 
-    interface Location<T> : Grid.Location<T> {
+    interface MutableLocation<T> : Grid.Location<T> {
         override var value: T
     }
 
-    interface Span<T> : Grid.Span<T> {
+    interface MutableSpan<T> : Grid.Span<T> {
         operator fun set(n: Int, value: T)
-        override fun ref(n: Int): Location<T>
+        override fun ref(n: Int): MutableLocation<T>
     }
 
     private class RowSpan<T>(
         private val y: Int,
         private val grid: MutableGrid<T>,
-    ) : Span<T> {
+    ) : MutableSpan<T> {
         override val size: Int = grid.xSpan.last + 1
         override fun get(n: Int) = grid[n, y]
         override fun set(n: Int, value: T) = grid.set(n, y, value)
-        override fun ref(n: Int): Location<T> = grid.ref(n, y)
+        override fun ref(n: Int): MutableLocation<T> = grid.ref(n, y)
         override fun spanIterator(n: Int): Grid.SpanIterator<T> = SpanIterator(n, this)
     }
 
     private class ColumnSpan<T>(
         private val x: Int,
         private val grid: MutableGrid<T>,
-    ) : Span<T> {
+    ) : MutableSpan<T> {
         override val size: Int = grid.ySpan.last + 1
         override fun get(n: Int) = grid[x, n]
         override fun set(n: Int, value: T) = grid.set(x, n, value)
-        override fun ref(n: Int): Location<T> = grid.ref(x, n)
+        override fun ref(n: Int): MutableLocation<T> = grid.ref(x, n)
         override fun spanIterator(n: Int): Grid.SpanIterator<T> = SpanIterator(n, this)
     }
 
     private class SpanIterator<T>(
         private var n: Int = 0,
-        private val span: Span<T>
+        private val span: MutableSpan<T>
     ) : Grid.SpanIterator<T> {
         override fun hasNext(): Boolean = n < span.size
         override fun next(): T = span[n++]
         override fun hasPrevious(): Boolean = n > 0
         override fun previous(): T = span[--n]
     }
+}
+
+private class ReverseSpanIterator<T>(
+    private val iter: Grid.SpanIterator<T>,
+) : Grid.SpanIterator<T> {
+    override fun hasPrevious(): Boolean = iter.hasNext()
+    override fun previous(): T = iter.next()
+    override fun hasNext(): Boolean = iter.hasPrevious()
+    override fun next(): T = iter.previous()
+}
+
+fun <T> Grid.Span<T>.asReverse(): Grid.Span<T> {
+    class ReverseSpan(val span: Grid.Span<T>) : Grid.Span<T> {
+        override val size: Int get() = span.size
+        override fun get(n: Int): T = span[span.size - n - 1]
+        override fun ref(n: Int): Grid.Location<T> = span.ref(span.size - n - 1)
+        override fun iterator(): Iterator<T> = spanIterator(0)
+        override fun spanIterator(n: Int) = ReverseSpanIterator(span.spanIterator(span.size - n - 1))
+    }
+
+    return if (this is ReverseSpan) this.span else ReverseSpan(this)
+}
+
+fun <T> MutableGrid.MutableSpan<T>.asReverse(): MutableGrid.MutableSpan<T> {
+    class MutableReverseSpan(val span: MutableGrid.MutableSpan<T>) : MutableGrid.MutableSpan<T> {
+        override val size: Int get() = span.size
+        override fun get(n: Int): T = span[span.size - n - 1]
+        override fun set(n: Int, value: T) = span.set(span.size - n - 1, value)
+        override fun ref(n: Int): MutableGrid.MutableLocation<T> = span.ref(span.size - n - 1)
+        override fun iterator(): Iterator<T> = spanIterator(0)
+        override fun spanIterator(n: Int) = ReverseSpanIterator(span.spanIterator(span.size - n - 1))
+    }
+
+    return if (this is MutableReverseSpan) this.span else MutableReverseSpan(this)
 }
