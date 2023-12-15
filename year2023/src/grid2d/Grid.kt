@@ -98,6 +98,10 @@ class MutableGrid<T>(
 private abstract class AbstractSpan<T> : Grid.Span<T> {
     override fun spanIterator(n: Int): Grid.SpanIterator<T> = SpanIterator(n, this)
 
+    override fun toString(): String {
+        return joinToString(prefix = "Span[", postfix = "]")
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is Grid.Span<*>) return false
@@ -125,10 +129,6 @@ private class RowSpan<T>(
     override fun get(n: Int) = grid[n, y]
     override fun set(n: Int, value: T) = grid.set(n, y, value)
     override fun ref(n: Int): MutableGrid.MutableLocation<T> = grid.ref(n, y)
-
-    override fun toString(): String {
-        return joinToString(prefix = "RowSpan(y=$y)[", postfix = "]")
-    }
 }
 
 private class ColumnSpan<T>(
@@ -139,10 +139,6 @@ private class ColumnSpan<T>(
     override fun get(n: Int) = grid[x, n]
     override fun set(n: Int, value: T) = grid.set(x, n, value)
     override fun ref(n: Int): MutableGrid.MutableLocation<T> = grid.ref(x, n)
-
-    override fun toString(): String {
-        return joinToString(prefix = "ColumnSpan(x=$x)[", postfix = "]")
-    }
 }
 
 private class SpanIterator<T>(
@@ -171,9 +167,7 @@ private open class ReverseSpan<T>(
     override fun get(n: Int): T = span[span.size - n - 1]
     override fun ref(n: Int): Grid.Location<T> = span.ref(span.size - n - 1)
     override fun spanIterator(n: Int): ReverseSpanIterator<T> =
-        ReverseSpanIterator(span.spanIterator(span.size - n - 1))
-
-    override fun toString(): String = "Reverse($span)"
+        ReverseSpanIterator(span.spanIterator(span.size - n))
 }
 
 private class MutableReverseSpan<T>(
