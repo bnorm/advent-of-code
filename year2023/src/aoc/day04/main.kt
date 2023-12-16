@@ -1,12 +1,12 @@
-package day04
+package aoc.day04
 
 import utils.*
 import kotlin.math.pow
 
 fun main() {
-    val sample1 = readInput("day04.sample1.txt")
-    val sample2 = readInput("day04.sample2.txt")
-    val input = readInput("day04.txt")
+    val input = readInput("aoc/day04/input.txt")
+    val sample1 = readInput("aoc/day04/sample1.txt")
+    val sample2 = readInput("aoc/day04/sample2.txt")
 
     require(part1(sample1) == "13")
     println(part1(input))

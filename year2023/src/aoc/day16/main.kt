@@ -1,6 +1,6 @@
 package aoc.day16
 
-import grid2d.*
+import utils.grid2d.*
 import utils.*
 
 fun main() {

@@ -1,4 +1,4 @@
-package grid2d
+package utils.grid2d
 
 fun <T> Grid<T>.flip(vertically: Boolean = false, horizontally: Boolean = false): Grid<T> {
     if (!vertically && !horizontally) return this

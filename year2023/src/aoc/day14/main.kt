@@ -1,12 +1,12 @@
-package day14
+package aoc.day14
 
-import grid2d.*
+import utils.grid2d.*
 import utils.*
 
 fun main() {
-    val sample1 = readInput("day14.sample1.txt")
-    val sample2 = readInput("day14.sample2.txt")
-    val input = readInput("day14.txt")
+    val input = readInput("aoc/day14/input.txt")
+    val sample1 = readInput("aoc/day14/sample1.txt")
+    val sample2 = readInput("aoc/day14/sample2.txt")
 
     val part1 = part1(sample1)
     require(part1 == "136") { part1 }

@@ -1,12 +1,12 @@
-package day08
+package aoc.day08
 
-import math.*
+import utils.lcm
 import utils.*
 
 fun main() {
-    val sample1 = readInput("day08.sample1.txt")
-    val sample2 = readInput("day08.sample2.txt")
-    val input = readInput("day08.txt")
+    val input = readInput("aoc/day08/input.txt")
+    val sample1 = readInput("aoc/day08/sample1.txt")
+    val sample2 = readInput("aoc/day08/sample2.txt")
 
     require(part1(sample1) == "2")
     println(part1(input))

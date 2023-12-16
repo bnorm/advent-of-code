@@ -1,13 +1,13 @@
-package day11
+package aoc.day11
 
-import grid2d.*
+import utils.grid2d.*
 import utils.*
 import kotlin.math.abs
 
 fun main() {
-    val sample1 = readInput("day11.sample1.txt")
-    val sample2 = readInput("day11.sample2.txt")
-    val input = readInput("day11.txt")
+    val input = readInput("aoc/day11/input.txt")
+    val sample1 = readInput("aoc/day11/sample1.txt")
+    val sample2 = readInput("aoc/day11/sample2.txt")
 
     require(part1(sample1) == "374")
     println(part1(input))

@@ -5,11 +5,7 @@ plugins {
 sourceSets {
     main {
         kotlin.srcDir("src")
-        resources.srcDir("res")
         resources.srcDir("src")
-    }
-    test {
-        kotlin.srcDir("test")
     }
 }
 

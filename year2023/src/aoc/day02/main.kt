@@ -1,11 +1,11 @@
-package day02
+package aoc.day02
 
 import utils.*
 
 fun main() {
-    val sample1 = readInput("day02.sample1.txt")
-    val sample2 = readInput("day02.sample2.txt")
-    val input = readInput("day02.txt")
+    val input = readInput("aoc/day02/input.txt")
+    val sample1 = readInput("aoc/day02/sample1.txt")
+    val sample2 = readInput("aoc/day02/sample2.txt")
 
     require(part1(sample1, CubeSet(red = 12, green = 13, blue = 14)) == "8")
     println(part1(input, CubeSet(red = 12, green = 13, blue = 14)))

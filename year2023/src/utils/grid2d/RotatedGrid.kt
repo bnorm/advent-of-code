@@ -1,4 +1,4 @@
-package grid2d
+package utils.grid2d
 
 fun <T> Grid<T>.rotate(count: Int = 1, clockwise: Boolean = true): Grid<T> {
     var clockwiseCount = (if (clockwise) count else -count) % 4

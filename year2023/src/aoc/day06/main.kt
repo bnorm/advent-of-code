@@ -1,4 +1,4 @@
-package day06
+package aoc.day06
 
 import utils.*
 import kotlin.math.ceil
@@ -6,9 +6,9 @@ import kotlin.math.floor
 import kotlin.math.sqrt
 
 fun main() {
-    val sample1 = readInput("day06.sample1.txt")
-    val sample2 = readInput("day06.sample2.txt")
-    val input = readInput("day06.txt")
+    val input = readInput("aoc/day06/input.txt")
+    val sample1 = readInput("aoc/day06/sample1.txt")
+    val sample2 = readInput("aoc/day06/sample2.txt")
 
     require(part1(sample1) == "288")
     println(part1(input))

@@ -1,11 +1,11 @@
-package day07
+package aoc.day07
 
 import utils.*
 
 fun main() {
-    val sample1 = readInput("day07.sample1.txt")
-    val sample2 = readInput("day07.sample2.txt")
-    val input = readInput("day07.txt")
+    val input = readInput("aoc/day07/input.txt")
+    val sample1 = readInput("aoc/day07/sample1.txt")
+    val sample2 = readInput("aoc/day07/sample2.txt")
 
     require(part1(sample1) == "6440")
     println(part1(input))

@@ -1,4 +1,4 @@
-package grid2d
+package utils.grid2d
 
 import kotlin.math.abs
 

@@ -1,4 +1,4 @@
-package grid2d
+package utils.grid2d
 
 
 inline fun <reified T> Grid(rows: List<List<T>>): Grid<T> = MutableGrid(rows).toImmutable()
