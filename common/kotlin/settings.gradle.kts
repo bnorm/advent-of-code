@@ -1,9 +1,7 @@
-rootProject.name = "year2023"
+rootProject.name = "utils"
 
 dependencyResolutionManagement {
     repositories {
         mavenCentral()
     }
 }
-
-includeBuild("../common/kotlin")

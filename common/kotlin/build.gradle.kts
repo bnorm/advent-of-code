@@ -5,10 +5,9 @@ plugins {
 sourceSets {
     main {
         kotlin.srcDir("src")
-        resources.srcDir("src")
     }
 }
 
 dependencies {
-    api(":utils:+")
+    api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
 }
