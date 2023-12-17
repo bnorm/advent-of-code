@@ -1,6 +1,9 @@
+@file:Suppress("unused")
+
 package utils.grid2d
 
 import kotlin.math.abs
+import kotlin.math.sqrt
 
 data class Point(val x: Int, val y: Int) {
     operator fun plus(other: Point): Point = Point(x + other.x, y + other.y)
@@ -28,12 +31,42 @@ data class Point(val x: Int, val y: Int) {
             Point(0, 1), // Up
             Point(1, 1), // Up Right
         )
+
+        fun manhattan(first: Point, second: Point): Long {
+            val dx = first.x.toLong() - second.x.toLong()
+            val dy = first.y.toLong() - second.y.toLong()
+            return abs(dx) + abs(dy)
+        }
+
+        fun distanceSquared(first: Point, second: Point): Long {
+            val dx = first.x.toLong() - second.x.toLong()
+            val dy = first.y.toLong() - second.y.toLong()
+            return dx * dx + dy * dy
+        }
+
+        fun distance(first: Point, second: Point): Double {
+            return sqrt(distanceSquared(first, second).toDouble())
+        }
     }
 }
 
+// TODO deprecate
 fun manhattan(first: Point, second: Point): Long {
-    return abs(first.x.toLong() - second.x.toLong()) + abs(first.y.toLong() - second.y.toLong())
+    return Point.manhattan(first, second)
 }
+
+// ===== DIRECTION ===== //
+
+fun Point.move(direction: Direction): Point {
+    return when (direction) {
+        Direction.East -> this + Point.ADJACENT[0]
+        Direction.South -> this + Point.ADJACENT[1]
+        Direction.West -> this + Point.ADJACENT[2]
+        Direction.North -> this + Point.ADJACENT[3]
+    }
+}
+
+// ===== GRID ===== //
 
 operator fun <T> Grid<T>.contains(point: Point): Boolean = point.x in xSpan && point.y in ySpan
 operator fun <T> Grid<T>.get(point: Point): T = get(point.x, point.y)
