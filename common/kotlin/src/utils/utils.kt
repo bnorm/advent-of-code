@@ -8,7 +8,9 @@ import kotlin.io.path.toPath
 
 fun readInput(fileName: String): List<String> {
     val resource = ClassLoader.getSystemResource(fileName) ?: throw NoSuchFileException(fileName)
-    return resource.toURI().toPath().readLines()
+    val lines = resource.toURI().toPath().readLines()
+    require(lines.isNotEmpty()) { "Input data required!" }
+    return lines
 }
 
 fun List<String>.separateBy(predicate: (String) -> Boolean): List<List<String>> {
