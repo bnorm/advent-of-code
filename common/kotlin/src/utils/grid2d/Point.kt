@@ -74,6 +74,15 @@ operator fun <T> MutableGrid<T>.set(point: Point, value: T) = set(point.x, point
 fun <T> Grid<T>.ref(point: Point) = ref(point.x, point.y)
 fun <T> MutableGrid<T>.ref(point: Point) = ref(point.x, point.y)
 
+val <T> Grid<T>.points: Sequence<Point>
+    get() = sequence {
+        for (y in ySpan) {
+            for (x in xSpan) {
+                yield(Point(x, y))
+            }
+        }
+    }
+
 fun <T> Grid<T>.findAll(predicate: (T) -> Boolean): Sequence<Point> = sequence {
     val grid = this@findAll
     for (x in xSpan) {
@@ -87,10 +96,10 @@ fun <T> Grid<T>.findAll(predicate: (T) -> Boolean): Sequence<Point> = sequence {
 fun <T> Grid<T>.adjacent(point: Point): Sequence<Point> = sequence {
     // Manually yield each adjacent point to avoid extra instance instantiation.
 
-    val right = point.x + 1 < xSpan.last
-    val down = point.y - 1 > 0
-    val left = point.x - 1 > 0
-    val up = point.y + 1 < ySpan.last
+    val right = point.x + 1 <= xSpan.last
+    val down = point.y - 1 >= 0
+    val left = point.x - 1 >= 0
+    val up = point.y + 1 <= ySpan.last
 
     if (right) yield(point.move(xDelta = 1, yDelta = 0))
     if (down) yield(point.move(xDelta = 0, yDelta = -1))
@@ -102,10 +111,10 @@ fun <T> Grid<T>.adjacent(point: Point): Sequence<Point> = sequence {
 fun <T> Grid<T>.neighbors(point: Point): Sequence<Point> = sequence {
     // Manually yield each neighbor point to avoid extra instance instantiation.
 
-    val right = point.x + 1 < xSpan.last
-    val down = point.y - 1 > 0
-    val left = point.x - 1 > 0
-    val up = point.y + 1 < ySpan.last
+    val right = point.x + 1 <= xSpan.last
+    val down = point.y - 1 <= 0
+    val left = point.x - 1 >= 0
+    val up = point.y + 1 <= ySpan.last
 
     if (right) yield(point.move(xDelta = 1, yDelta = 0))
     if (down && right) yield(point.move(xDelta = 1, yDelta = -1))
