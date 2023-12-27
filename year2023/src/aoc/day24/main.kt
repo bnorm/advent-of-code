@@ -32,7 +32,7 @@ fun part1(input: List<String>, min: Long, max: Long): String {
 
 fun part2(input: List<String>): String {
     val stones = input.map { HailStone.parse(it) }
-    require(stones.size >= 5) // Need at least 5 stones to solve with math.
+    require(stones.size >= 3) // Need at least 3 stones to solve with math.
 
     val p1 = stones[0].p
     val v1 = stones[0].v
@@ -40,10 +40,8 @@ fun part2(input: List<String>): String {
     val v2 = stones[1].v
     val p3 = stones[2].p
     val v3 = stones[2].v
-    val p4 = stones[3].p
-    val v4 = stones[3].v
-    val p5 = stones[4].p
-    val v5 = stones[4].v
+
+    // Help from: https://www.reddit.com/r/adventofcode/comments/18pnycy/comment/kf068o2/?utm_source=share&utm_medium=web2x&context=3
 
     // Intersection of stones 0 (unknown) and stone 1.
     // p0x + t * v0x = p1x + t * v1x
@@ -68,56 +66,37 @@ fun part2(input: List<String>): String {
     // (p0x * v1y - p0x * v2y) + (p0y * v2x - p0y * v1x) + (v0x * p2y - v0x * p1y) + (v0y * p1x - v0y * p2x)  =  [(p1x * v1y - p1y * v1x) - (p2x * v2y - p2y * v2x)]
     // p0x * (v1y - v2y) + p0y * (v2x - v1x) + v0x * (p2y - p1y) + v0y * (p1x - p2x)  =  [(p1x * v1y - p1y * v1x) - (p2x * v2y - p2y * v2x)]
 
-    // Add stones 3, 4, and 5 to complete system of equations.
-    // p0x * (v1y - v2y) + p0y * (v2x - v1x) + v0x * (p2y - p1y) + v0y * (p1x - p2x)  =  [(p1x * v1y - p1y * v1x) - (p2x * v2y - p2y * v2x)]
-    // p0x * (v1y - v3y) + p0y * (v3x - v1x) + v0x * (p3y - p1y) + v0y * (p1x - p3x)  =  [(p1x * v1y - p1y * v1x) - (p3x * v3y - p3y * v3x)]
-    // p0x * (v1y - v4y) + p0y * (v4x - v1x) + v0x * (p4y - p1y) + v0y * (p1x - p4x)  =  [(p1x * v1y - p1y * v1x) - (p4x * v4y - p4y * v4x)]
-    // p0x * (v1y - v5y) + p0y * (v5x - v1x) + v0x * (p5y - p1y) + v0y * (p1x - p5x)  =  [(p1x * v1y - p1y * v1x) - (p5x * v5y - p5y * v5x)]
+    // Add stone 3 and the z-axis to complete system of equations.
+    // p0x * (v1y - v2y) + p0y * (v2x - v1x)                     + v0x * (p2y - p1y) + v0y * (p1x - p2x)                      =  [(p1x * v1y - p1y * v1x) - (p2x * v2y - p2y * v2x)]
+    // p0x * (v1z - v2z)                     + p0z * (v2x - v1x) + v0x * (p2z - p1z)                     + v0z * (p1x - p2x)  =  [(p1x * v1z - p1z * v1x) - (p2x * v2z - p2z * v2x)]
+    //                     p0y * (v1z - v2z) + p0z * (v2y - v1y) +                     v0y * (p2z - p1z) + v0z * (p1y - p2y)  =  [(p1y * v1z - p1z * v1y) - (p2y * v2z - p2z * v2y)]
+
+    // p0x * (v1y - v3y) + p0y * (v3x - v1x)                     + v0x * (p3y - p1y) + v0y * (p1x - p3x)                      =  [(p1x * v1y - p1y * v1x) - (p3x * v3y - p3y * v3x)]
+    // p0x * (v1z - v3z)                     + p0z * (v3x - v1x) + v0x * (p3z - p1z)                     + v0z * (p1x - p3x)  =  [(p1x * v1z - p1z * v1x) - (p3x * v3z - p3z * v3x)]
+    //                     p0y * (v1z - v3z) + p0z * (v3y - v1y) +                     v0y * (p3z - p1z) + v0z * (p1y - p3y)  =  [(p1y * v1z - p1z * v1y) - (p3y * v3z - p3z * v3y)]
 
     val m = Matrix(
         arrayOf(
-            arrayOf(v1.y - v2.y, v2.x - v1.x, p2.y - p1.y, p1.x - p2.x),
-            arrayOf(v1.y - v3.y, v3.x - v1.x, p3.y - p1.y, p1.x - p3.x),
-            arrayOf(v1.y - v4.y, v4.x - v1.x, p4.y - p1.y, p1.x - p4.x),
-            arrayOf(v1.y - v5.y, v5.x - v1.x, p5.y - p1.y, p1.x - p5.x),
+            arrayOf(v1.y - v2.y, v2.x - v1.x, BigInteger.ZERO, p2.y - p1.y, p1.x - p2.x, BigInteger.ZERO),
+            arrayOf(v1.z - v2.z, BigInteger.ZERO, v2.x - v1.x, p2.z - p1.z, BigInteger.ZERO, p1.x - p2.x),
+            arrayOf(BigInteger.ZERO, v1.z - v2.z, v2.y - v1.y, BigInteger.ZERO, p2.z - p1.z, p1.y - p2.y),
+            arrayOf(v1.y - v3.y, v3.x - v1.x, BigInteger.ZERO, p3.y - p1.y, p1.x - p3.x, BigInteger.ZERO),
+            arrayOf(v1.z - v3.z, BigInteger.ZERO, v3.x - v1.x, p3.z - p1.z, BigInteger.ZERO, p1.x - p3.x),
+            arrayOf(BigInteger.ZERO, v1.z - v3.z, v3.y - v1.y, BigInteger.ZERO, p3.z - p1.z, p1.y - p3.y),
         )
     )
 
     val b = Vector(
         (p1.x * v1.y - p1.y * v1.x) - (p2.x * v2.y - p2.y * v2.x),
+        (p1.x * v1.z - p1.z * v1.x) - (p2.x * v2.z - p2.z * v2.x),
+        (p1.y * v1.z - p1.z * v1.y) - (p2.y * v2.z - p2.z * v2.y),
         (p1.x * v1.y - p1.y * v1.x) - (p3.x * v3.y - p3.y * v3.x),
-        (p1.x * v1.y - p1.y * v1.x) - (p4.x * v4.y - p4.y * v4.x),
-        (p1.x * v1.y - p1.y * v1.x) - (p5.x * v5.y - p5.y * v5.x),
+        (p1.x * v1.z - p1.z * v1.x) - (p3.x * v3.z - p3.z * v3.x),
+        (p1.y * v1.z - p1.z * v1.y) - (p3.y * v3.z - p3.z * v3.y),
     )
 
     solve(m, b)
-    val (p0x, p0y, v0x, v0y) = b
-
-    // Solve for z-axis with stones 1 and 2.
-
-    // t = (p1x - p0x) / (v0x - v1x)
-    // s = (p2x - p0x) / (v0x - v2x)
-
-    val t = if (v0x != v1.x) (p1.x - p0x) / (v0x - v1.x) else (p1.y - p0y) / (v0y - v1.y)
-    val s = if (v0x != v2.x) (p2.x - p0x) / (v0x - v2.x) else (p2.y - p0y) / (v0y - v2.y)
-
-    // p0z + t * v0z = p1z + t * v1z = ptz
-    // p0z + s * v0z = p2z + s * v2z = psz
-
-    // p0z + t * v0z = ptz
-    // v0z = (ptz - p0z) / t
-
-    // p0z + s * v0z = psz
-    // p0z + s * (ptz - p0z) / t = psz
-    // p0z + s * ptz / t - s * p0z / t = psz
-    // p0z - s * p0z / t = psz - s * ptz / t
-    // t * p0z - s * p0z = t * psz - s * ptz
-    // p0z = (t * psz - s * ptz) / (t - s)
-
-    val ptz = p1.z + t * v1.z
-    val psz = p2.z + s * v2.z
-    val p0z = (t * psz - s * ptz) / (t - s)
-
+    val (p0x, p0y, p0z) = b
     return (p0x + p0y + p0z).toString()
 }
 
