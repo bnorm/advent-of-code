@@ -1,3 +1,7 @@
 product:
   type: lib
   platforms: [jvm]
+
+dependencies:
+  - io.ktor:ktor-client-core:3.0.2
+  - io.ktor:ktor-client-okhttp:3.0.2

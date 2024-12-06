@@ -10,3 +10,6 @@ Cargo.lock
 *.iml
 .idea
 out/
+
+# AoC
+/.aoc/
