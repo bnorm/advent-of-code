@@ -6,8 +6,8 @@ inline fun <reified T> Grid(rows: List<List<T>>): Grid<T> = MutableGrid(rows).to
 inline fun <reified T> MutableGrid(rows: List<List<T>>): MutableGrid<T> =
     MutableGrid(Array(rows.size) { rows[it].toTypedArray() })
 
+private class ImmutableGrid<T>(delegate: Grid<T>) : Grid<T> by delegate
 fun <T> Grid<T>.toImmutable(): Grid<T> {
-    class ImmutableGrid(delegate: Grid<T>) : Grid<T> by delegate
     return if (this is ImmutableGrid) this else ImmutableGrid(this)
 }
 
