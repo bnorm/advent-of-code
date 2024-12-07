@@ -1,11 +1,22 @@
 package aoc.day02
 
-import utils.readInput
+import aoc.input.downloadInput
 
-fun main() {
-    val input = readInput("aoc/day02/input.txt")
-    val sample1 = readInput("aoc/day02/sample1.txt")
-    val sample2 = readInput("aoc/day02/sample2.txt")
+private const val SAMPLE1 = """
+7 6 4 2 1
+1 2 7 8 9
+9 7 6 2 1
+1 3 2 4 5
+8 6 4 4 1
+1 3 6 7 9
+"""
+
+const val SAMPLE2 = SAMPLE1
+
+suspend fun main() {
+    val input = downloadInput(2024, 2).trim().lines()
+    val sample1 = SAMPLE1.trim().lines()
+    val sample2 = SAMPLE2.trim().lines()
 
     require(part1(sample1) == "2")
     println(part1(input))

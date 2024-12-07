@@ -1,12 +1,23 @@
 package aoc.day01
 
-import utils.readInput
+import aoc.input.downloadInput
 import kotlin.math.abs
 
-fun main() {
-    val input = readInput("aoc/day01/input.txt")
-    val sample1 = readInput("aoc/day01/sample1.txt")
-    val sample2 = readInput("aoc/day01/sample2.txt")
+private const val SAMPLE1 = """
+3   4
+4   3
+2   5
+1   3
+3   9
+3   3
+"""
+
+const val SAMPLE2 = SAMPLE1
+
+suspend fun main() {
+    val input = downloadInput(2024, 1).trim().lines()
+    val sample1 = SAMPLE1.trim().lines()
+    val sample2 = SAMPLE2.trim().lines()
 
     require(part1(sample1) == "11")
     println(part1(input))
