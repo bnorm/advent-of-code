@@ -7,6 +7,7 @@ import kotlin.math.sqrt
 
 data class Point(val x: Int, val y: Int) {
     operator fun plus(other: Point): Point = Point(x + other.x, y + other.y)
+    operator fun minus(other: Point): Point = Point(x - other.x, y - other.y)
     fun move(xDelta: Int = 0, yDelta: Int = 0): Point = Point(x + xDelta, y + yDelta)
 
     override fun toString(): String = "($x, $y)"
