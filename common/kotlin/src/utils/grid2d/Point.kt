@@ -113,7 +113,7 @@ fun <T> Grid<T>.neighbors(point: Point): Sequence<Point> = sequence {
     // Manually yield each neighbor point to avoid extra instance instantiation.
 
     val right = point.x + 1 <= xSpan.last
-    val down = point.y - 1 <= 0
+    val down = point.y - 1 >= 0
     val left = point.x - 1 >= 0
     val up = point.y + 1 <= ySpan.last
 
