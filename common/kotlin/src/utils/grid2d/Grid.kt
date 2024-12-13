@@ -1,5 +1,17 @@
 package utils.grid2d
 
+fun Grid(input: String, reversed: Boolean = true): Grid<Char> {
+    return MutableGrid(input, reversed).toImmutable()
+}
+
+fun MutableGrid(input: String, reversed: Boolean = true): MutableGrid<Char> {
+    val lines = input.trim().lines()
+    val grid = Array(lines.size) { y ->
+        val line = if (reversed) lines[lines.size - y - 1] else lines[y]
+        Array(line.length) { x -> line[x] }
+    }
+    return MutableGrid(grid)
+}
 
 inline fun <reified T> Grid(rows: List<List<T>>): Grid<T> = MutableGrid(rows).toImmutable()
 
