@@ -8,6 +8,8 @@ import kotlin.math.sqrt
 data class Point(val x: Int, val y: Int) {
     operator fun plus(other: Point): Point = Point(x + other.x, y + other.y)
     operator fun minus(other: Point): Point = Point(x - other.x, y - other.y)
+    operator fun times(other: Int): Point = Point(x * other, y * other)
+
     fun move(xDelta: Int = 0, yDelta: Int = 0): Point = Point(x + xDelta, y + yDelta)
 
     override fun toString(): String = "($x, $y)"
@@ -50,6 +52,8 @@ data class Point(val x: Int, val y: Int) {
         }
     }
 }
+
+operator fun Int.times(other: Point): Point = other.times(this)
 
 // TODO deprecate
 fun manhattan(first: Point, second: Point): Long {
@@ -108,6 +112,11 @@ fun <T> Grid<T>.adjacent(point: Point): Sequence<Point> = sequence {
     if (up) yield(point.move(xDelta = 0, yDelta = +1))
 }
 
+fun Point.isAdjacent(other: Point): Boolean {
+    return y == other.y && (x == other.x - 1 || x == other.x + 1) ||
+            x == other.x && (y == other.y - 1 || y == other.y - 1)
+}
+
 /** Returns all [neighbor][Point.NEIGHBORS] points to the specified point. */
 fun <T> Grid<T>.neighbors(point: Point): Sequence<Point> = sequence {
     // Manually yield each neighbor point to avoid extra instance instantiation.
@@ -125,4 +134,9 @@ fun <T> Grid<T>.neighbors(point: Point): Sequence<Point> = sequence {
     if (up && left) yield(point.move(xDelta = -1, yDelta = 1))
     if (up) yield(point.move(xDelta = 0, yDelta = 1))
     if (up && right) yield(point.move(xDelta = 1, yDelta = 1))
+}
+
+fun Point.isNeighbor(other: Point): Boolean {
+    return (x != other.x || y != other.y) &&
+            (x in (other.x - 1)..(other.x + 1) && y in (other.y - 1)..(other.y + 1))
 }

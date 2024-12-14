@@ -16,3 +16,8 @@ kotlin {
         }
     }
 }
+
+// Useful if reading from stdin is desired.
+//tasks.withType<JavaExec> {
+//    standardInput = System.`in`
+//}
