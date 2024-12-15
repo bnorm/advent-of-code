@@ -27,8 +27,6 @@ interface Grid<out T> {
     val xSpan: IntRange
     val ySpan: IntRange
 
-    fun contains(x: Int, y: Int): Boolean = x in xSpan && y in ySpan
-
     operator fun get(x: Int, y: Int): T
     fun ref(x: Int, y: Int): Location<T>
 
@@ -41,8 +39,10 @@ interface Grid<out T> {
 
     interface Span<out T> : Iterable<T> {
         val size: Int
+        fun contains(n: Int): Boolean = n >= 0 && n < size
         operator fun get(n: Int): T
         fun ref(n: Int): Location<T>
+        fun subSpan(start: Int = 0, endExclusive: Int = size): Span<T>
         override fun iterator(): Iterator<T> = spanIterator(0)
         fun spanIterator(n: Int = 0): SpanIterator<T>
     }
@@ -53,49 +53,12 @@ interface Grid<out T> {
     }
 }
 
-class MutableGrid<T>(
-    private val rows: Array<Array<T>>,
-) : Grid<T> {
-    init {
-        val rowSizes = rows.map { it.size }
-        require(rowSizes.isNotEmpty()) { "Must have at least 1 row." }
-        require(rowSizes.toSet().size == 1) { "All rows must have the same length." }
-    }
+interface MutableGrid<T> : Grid<T> {
+    operator fun set(x: Int, y: Int, value: T)
+    override fun ref(x: Int, y: Int): MutableLocation<T>
 
-    override val xSpan: IntRange = rows[0].indices
-    override val ySpan: IntRange = rows.indices
-    private fun checkBounds(x: Int, y: Int): Unit = require(contains(x, y)) { "($x, $y) !in ($xSpan, $ySpan)" }
-
-    override fun get(x: Int, y: Int): T {
-        checkBounds(x, y)
-        return rows[y][x]
-    }
-
-    operator fun set(x: Int, y: Int, value: T) {
-        checkBounds(x, y)
-        rows[y][x] = value
-    }
-
-    override fun ref(x: Int, y: Int): MutableLocation<T> {
-        checkBounds(x, y)
-        return object : MutableLocation<T> {
-            override var value: T
-                get() = rows[y][x]
-                set(value) {
-                    rows[y][x] = value
-                }
-        }
-    }
-
-    override fun row(y: Int): MutableSpan<T> {
-        checkBounds(0, y)
-        return RowSpan(y, this)
-    }
-
-    override fun column(x: Int): MutableSpan<T> {
-        checkBounds(x, 0)
-        return ColumnSpan(x, this)
-    }
+    override fun row(y: Int): MutableSpan<T>
+    override fun column(x: Int): MutableSpan<T>
 
     interface MutableLocation<T> : Grid.Location<T> {
         override var value: T
@@ -104,10 +67,65 @@ class MutableGrid<T>(
     interface MutableSpan<T> : Grid.Span<T> {
         operator fun set(n: Int, value: T)
         override fun ref(n: Int): MutableLocation<T>
+        override fun subSpan(start: Int, endExclusive: Int): MutableSpan<T>
+    }
+
+    // TODO mutable SpanIterator?
+}
+
+@PublishedApi
+internal fun <T> MutableGrid(rows: Array<Array<T>>): MutableGrid<T> =
+    RealMutableGrid(rows)
+
+private class RealMutableGrid<T>(
+    private val rows: Array<Array<T>>,
+) : MutableGrid<T> {
+    init {
+        val rowSizes = rows.map { it.size }
+        require(rowSizes.isNotEmpty()) { "Must have at least 1 row." }
+        require(rowSizes.toSet().size == 1) { "All rows must have the same length." }
+    }
+
+    override val xSpan: IntRange = rows[0].indices
+    override val ySpan: IntRange = rows.indices
+    private fun checkBounds(x: Int, y: Int): Unit =
+        require(x in xSpan && y in ySpan) { "($x, $y) !in ($xSpan, $ySpan)" }
+
+    override fun get(x: Int, y: Int): T {
+        checkBounds(x, y)
+        return rows[y][x]
+    }
+
+    override fun set(x: Int, y: Int, value: T) {
+        checkBounds(x, y)
+        rows[y][x] = value
+    }
+
+    override fun ref(x: Int, y: Int): MutableGrid.MutableLocation<T> {
+        checkBounds(x, y)
+        return object : MutableGrid.MutableLocation<T> {
+            override var value: T
+                get() = rows[y][x]
+                set(value) {
+                    rows[y][x] = value
+                }
+        }
+    }
+
+    override fun row(y: Int): MutableGrid.MutableSpan<T> {
+        checkBounds(0, y)
+        return RowSpan(y, this, 0, xSpan.last + 1)
+    }
+
+    override fun column(x: Int): MutableGrid.MutableSpan<T> {
+        checkBounds(x, 0)
+        return ColumnSpan(x, this, 0, ySpan.last + 1)
     }
 }
 
 private abstract class AbstractSpan<T> : Grid.Span<T> {
+    fun checkBounds(n: Int): Unit = require(contains(n)) { "$n !in ${0..<size}" }
+
     override fun spanIterator(n: Int): Grid.SpanIterator<T> = SpanIterator(n, this)
 
     override fun toString(): String {
@@ -136,27 +154,69 @@ private abstract class AbstractSpan<T> : Grid.Span<T> {
 private class RowSpan<T>(
     private val y: Int,
     private val grid: MutableGrid<T>,
+    private val offset: Int,
+    override val size: Int,
 ) : AbstractSpan<T>(), MutableGrid.MutableSpan<T> {
-    override val size: Int = grid.xSpan.last + 1
-    override fun get(n: Int) = grid[n, y]
-    override fun set(n: Int, value: T) = grid.set(n, y, value)
-    override fun ref(n: Int): MutableGrid.MutableLocation<T> = grid.ref(n, y)
+    override fun get(n: Int): T {
+        checkBounds(n)
+        return grid[offset + n, y]
+    }
+
+    override fun set(n: Int, value: T) {
+        checkBounds(n)
+        grid[offset + n, y] = value
+    }
+
+    override fun ref(n: Int): MutableGrid.MutableLocation<T> {
+        checkBounds(n)
+        return grid.ref(offset + n, y)
+    }
+
+    override fun subSpan(start: Int, endExclusive: Int): MutableGrid.MutableSpan<T> {
+        require(endExclusive > start) {}
+        checkBounds(start)
+        checkBounds(endExclusive - 1)
+        return RowSpan(y, grid, start + offset, endExclusive - start)
+    }
 }
 
 private class ColumnSpan<T>(
     private val x: Int,
     private val grid: MutableGrid<T>,
+    private val offset: Int,
+    override val size: Int,
 ) : AbstractSpan<T>(), MutableGrid.MutableSpan<T> {
-    override val size: Int = grid.ySpan.last + 1
-    override fun get(n: Int) = grid[x, n]
-    override fun set(n: Int, value: T) = grid.set(x, n, value)
-    override fun ref(n: Int): MutableGrid.MutableLocation<T> = grid.ref(x, n)
+    override fun get(n: Int): T {
+        checkBounds(n)
+        return grid[x, offset + n]
+    }
+
+    override fun set(n: Int, value: T) {
+        checkBounds(n)
+        grid[x, offset + n] = value
+    }
+
+    override fun ref(n: Int): MutableGrid.MutableLocation<T> {
+        checkBounds(n)
+        return grid.ref(x, offset + n)
+    }
+
+    override fun subSpan(start: Int, endExclusive: Int): MutableGrid.MutableSpan<T> {
+        require(endExclusive > start) {}
+        checkBounds(start)
+        checkBounds(endExclusive - 1)
+        return ColumnSpan(x, grid, start + offset, endExclusive - start)
+    }
 }
 
 private class SpanIterator<T>(
     private var n: Int = 0,
     private val span: Grid.Span<T>
 ) : Grid.SpanIterator<T> {
+    init {
+        require(n >= 0 && n <= span.size) { "$n !in ${0..span.size}" }
+    }
+
     override fun hasNext(): Boolean = n < span.size
     override fun next(): T = span[n++]
     override fun hasPrevious(): Boolean = n > 0
@@ -173,24 +233,36 @@ private class ReverseSpanIterator<T>(
 }
 
 private open class ReverseSpan<T>(
-    val span: Grid.Span<T>,
+    open val delegate: Grid.Span<T>,
 ) : AbstractSpan<T>(), Grid.Span<T> {
-    override val size: Int get() = span.size
-    override fun get(n: Int): T = span[span.size - n - 1]
-    override fun ref(n: Int): Grid.Location<T> = span.ref(span.size - n - 1)
+    @Suppress("NOTHING_TO_INLINE")
+    inline fun delegateN(n: Int): Int = delegate.size - n - 1
+
+    override val size: Int get() = delegate.size
+    override fun get(n: Int): T = delegate[delegateN(n)]
+    override fun ref(n: Int): Grid.Location<T> = delegate.ref(delegateN(n))
+
+    override fun subSpan(start: Int, endExclusive: Int): Grid.Span<T> {
+        return ReverseSpan(delegate.subSpan(delegate.size - endExclusive, delegate.size - start))
+    }
+
     override fun spanIterator(n: Int): ReverseSpanIterator<T> =
-        ReverseSpanIterator(span.spanIterator(span.size - n))
+        ReverseSpanIterator(delegate.spanIterator(delegate.size - n))
 }
 
 private class MutableReverseSpan<T>(
-    val mutableSpan: MutableGrid.MutableSpan<T>,
-) : ReverseSpan<T>(mutableSpan), MutableGrid.MutableSpan<T> {
-    override fun set(n: Int, value: T) = mutableSpan.set(mutableSpan.size - n - 1, value)
-    override fun ref(n: Int): MutableGrid.MutableLocation<T> = mutableSpan.ref(mutableSpan.size - n - 1)
+    override val delegate: MutableGrid.MutableSpan<T>,
+) : ReverseSpan<T>(delegate), MutableGrid.MutableSpan<T> {
+    override fun set(n: Int, value: T) = delegate.set(delegateN(n), value)
+    override fun ref(n: Int): MutableGrid.MutableLocation<T> = delegate.ref(delegateN(n))
+
+    override fun subSpan(start: Int, endExclusive: Int): MutableGrid.MutableSpan<T> {
+        return MutableReverseSpan(delegate.subSpan(delegate.size - endExclusive, delegate.size - start))
+    }
 }
 
 fun <T> Grid.Span<T>.asReverse(): Grid.Span<T> =
-    if (this is ReverseSpan) this.span else ReverseSpan(this)
+    if (this is ReverseSpan) this.delegate else ReverseSpan(this)
 
 fun <T> MutableGrid.MutableSpan<T>.asReverse(): MutableGrid.MutableSpan<T> =
-    if (this is MutableReverseSpan) this.mutableSpan else MutableReverseSpan(this)
+    if (this is MutableReverseSpan) this.delegate else MutableReverseSpan(this)

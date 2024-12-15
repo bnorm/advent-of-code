@@ -6,6 +6,9 @@ sourceSets {
     main {
         kotlin.srcDir("src")
     }
+    test {
+        kotlin.srcDir("test")
+    }
 }
 
 dependencies {
@@ -14,4 +17,10 @@ dependencies {
     implementation("io.ktor:ktor-client-core:3.0.2")
     runtimeOnly("io.ktor:ktor-client-okhttp:3.0.2")
     runtimeOnly("org.slf4j:slf4j-nop:2.0.16")
+
+    testImplementation(kotlin("test-junit5"))
+}
+
+tasks.withType<Test> {
+    useJUnitPlatform()
 }
