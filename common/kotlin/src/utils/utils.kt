@@ -3,6 +3,7 @@
 package utils
 
 import java.nio.file.NoSuchFileException
+import kotlin.experimental.ExperimentalTypeInference
 import kotlin.io.path.readLines
 import kotlin.io.path.toPath
 
@@ -70,4 +71,14 @@ fun <T> findCycleSize(items: List<T>): Int? {
         return cycleSize
     }
     return null
+}
+
+@OptIn(ExperimentalTypeInference::class)
+fun <T, R> Sequence<T>.transform(@BuilderInference block: suspend SequenceScope<R>.(T) -> Unit): Sequence<R> {
+    val upstream = this
+    return sequence {
+        for (item in upstream) {
+            block(item)
+        }
+    }
 }
