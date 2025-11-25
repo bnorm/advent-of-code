@@ -1,0 +1,3 @@
+modules:
+  - ./year2025
+  - ./common/kotlin

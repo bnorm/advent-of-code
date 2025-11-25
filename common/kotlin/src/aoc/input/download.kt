@@ -16,9 +16,9 @@ suspend fun downloadInput(year: Int, day: Int): String {
         expectSuccess = true
 
         install(HttpCookies) {
-            val sessionCookie = Path(".aoc/session").readText().trim()
-            storage =
-                ConstantCookiesStorage(Cookie(name = "session", value = sessionCookie, domain = "adventofcode.com"))
+            val session = Path(".aoc/session").readText().trim()
+            val cookie = Cookie(name = "session", value = session, domain = "adventofcode.com")
+            storage = ConstantCookiesStorage(cookie)
         }
 
         install(HttpCache) {
