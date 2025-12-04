@@ -1,6 +1,7 @@
 package aoc.input
 
 import io.ktor.client.*
+import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.cache.*
 import io.ktor.client.plugins.cache.storage.*
 import io.ktor.client.plugins.cookies.*
@@ -12,6 +13,9 @@ import kotlin.io.path.createDirectories
 import kotlin.io.path.readText
 
 suspend fun downloadInput(year: Int, day: Int): String {
+    require(day > 0)
+    require(year > 0)
+
     val client = HttpClient {
         expectSuccess = true
 
@@ -24,6 +28,11 @@ suspend fun downloadInput(year: Int, day: Int): String {
         install(HttpCache) {
             val cacheFile = Path(".aoc/cache").createDirectories()
             publicStorage(FileStorage(cacheFile.toFile()))
+        }
+
+        install(DefaultRequest) {
+            val userAgent = Path(".aoc/user-agent").readText().trim()
+            header(HttpHeaders.UserAgent, userAgent)
         }
     }
 
