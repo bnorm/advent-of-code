@@ -13,6 +13,13 @@ fun MutableGrid(input: String, reversed: Boolean = true): MutableGrid<Char> {
     return MutableGrid(grid)
 }
 
+inline fun <reified T> MutableGrid(xSpan: Int, ySpan: Int, factory: (x: Int, y: Int) -> T): MutableGrid<T> {
+    val grid = Array(ySpan) { y ->
+        Array(xSpan) { x -> factory(x, y) }
+    }
+    return MutableGrid(grid)
+}
+
 inline fun <reified T> Grid(rows: List<List<T>>): Grid<T> = MutableGrid(rows).toImmutable()
 
 inline fun <reified T> MutableGrid(rows: List<List<T>>): MutableGrid<T> =
