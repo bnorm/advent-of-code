@@ -34,13 +34,28 @@ class Matrix<T>(
         checkBounds(0, c)
         return ColumnVector(c, this)
     }
+
+    override fun toString(): String {
+        return buildString {
+            for (r in rows) {
+                if (r == 0) append("[[") else append(" [")
+
+                for (c in columns) {
+                    if (c != 0) append(", ")
+                    append(this@Matrix[r, c])
+                }
+
+                if (r == rows.last) append("]]") else appendLine("]")
+            }
+        }
+    }
 }
 
 private class RowVector<T>(
     private val r: Int,
     private val matrix: Matrix<T>,
 ) : AbstractVector<T>() {
-    override val size: Int = matrix.rows.last + 1
+    override val size: Int = matrix.columns.last + 1
     override fun get(i: Int) = matrix[r, i]
     override fun set(i: Int, value: T) = matrix.set(r, i, value)
 }
@@ -49,7 +64,7 @@ private class ColumnVector<T>(
     private val c: Int,
     private val matrix: Matrix<T>,
 ) : AbstractVector<T>() {
-    override val size: Int = matrix.columns.last + 1
+    override val size: Int = matrix.rows.last + 1
     override fun get(i: Int) = matrix[i, c]
     override fun set(i: Int, value: T) = matrix.set(i, c, value)
 }

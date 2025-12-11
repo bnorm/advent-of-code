@@ -3,6 +3,7 @@
 package aoc.day00
 
 import aoc.input.downloadInput
+import kotlin.time.measureTimedValue
 
 const val SAMPLE1 = """
 """
@@ -14,11 +15,11 @@ suspend fun main() {
 
     val part1 = part1(SAMPLE1)
     require(part1 == "") { part1 }
-    println(part1(input))
+    println(measureTimedValue { part1(input) })
 
     val part2 = part2(SAMPLE2)
     require(part2 == "") { part2 }
-    println(part2(input))
+    println(measureTimedValue { part2(input) })
 }
 
 private fun part1(input: String): String {
