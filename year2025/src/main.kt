@@ -10,4 +10,5 @@ suspend fun main() {
     aoc.year2025.day09.main()
     aoc.year2025.day10.main()
     aoc.year2025.day11.main()
+    aoc.year2025.day12.main()
 }
