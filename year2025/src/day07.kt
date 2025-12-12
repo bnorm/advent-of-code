@@ -1,8 +1,8 @@
 @file:Suppress("PackageDirectoryMismatch")
 
-package aoc.day07
+package aoc.year2025.day07
 
-import aoc.input.downloadInput
+import aoc.run
 import utils.grid2d.*
 
 const val SAMPLE1 = """
@@ -26,17 +26,10 @@ const val SAMPLE1 = """
 
 const val SAMPLE2 = SAMPLE1
 
-suspend fun main() {
-    val input = downloadInput(2025, 7)
-
-    val part1 = part1(SAMPLE1)
-    require(part1 == "21") { part1 }
-    println(part1(input))
-
-    val part2 = part2(SAMPLE2)
-    require(part2 == "40") { part2 }
-    println(part2(input))
-}
+suspend fun main() = run(
+    part1 = ::part1, sample1 = SAMPLE1, expected1 = "21",
+    part2 = ::part2, sample2 = SAMPLE2, expected2 = "40",
+)
 
 private fun part1(input: String): String {
     val grid = Grid(input, reversed = false)

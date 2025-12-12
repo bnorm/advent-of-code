@@ -1,8 +1,8 @@
 @file:Suppress("PackageDirectoryMismatch")
 
-package aoc.day06
+package aoc.year2025.day06
 
-import aoc.input.downloadInput
+import aoc.run
 import utils.grid2d.*
 
 const val SAMPLE1 = """
@@ -14,17 +14,10 @@ const val SAMPLE1 = """
 
 const val SAMPLE2 = SAMPLE1
 
-suspend fun main() {
-    val input = downloadInput(2025, 6)
-
-    val part1 = part1(SAMPLE1)
-    require(part1 == "4277556") { part1 }
-    println(part1(input))
-
-    val part2 = part2(SAMPLE2)
-    require(part2 == "3263827") { part2 }
-    println(part2(input))
-}
+suspend fun main() = run(
+    part1 = ::part1, sample1 = SAMPLE1, expected1 = "4277556",
+    part2 = ::part2, sample2 = SAMPLE2, expected2 = "3263827",
+)
 
 private fun part1(input: String): String {
     val lines = input.trim().lines()

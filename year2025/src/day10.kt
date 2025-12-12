@@ -1,6 +1,6 @@
 @file:Suppress("PackageDirectoryMismatch")
 
-package aoc.day10
+package aoc.year2025.day10
 
 import aoc.math.*
 import aoc.run
@@ -16,7 +16,6 @@ const val SAMPLE1 = """
 const val SAMPLE2 = SAMPLE1
 
 suspend fun main() = run(
-    year = 2025, day = 10,
     part1 = ::part1, sample1 = SAMPLE1, expected1 = "7",
     part2 = ::part2, sample2 = SAMPLE2, expected2 = "33",
 )

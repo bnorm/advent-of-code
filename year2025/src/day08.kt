@@ -1,8 +1,10 @@
 @file:Suppress("PackageDirectoryMismatch")
 
-package aoc.day08
+package aoc.year2025.day08
 
+import aoc.benchmark
 import aoc.input.downloadInput
+import aoc.test
 import java.util.*
 
 const val SAMPLE1 = """
@@ -32,14 +34,10 @@ const val SAMPLE2 = SAMPLE1
 
 suspend fun main() {
     val input = downloadInput(2025, 8)
-
-    val part1 = part1(SAMPLE1, 10)
-    require(part1 == "40") { part1 }
-    println(part1(input, 1000))
-
-    val part2 = part2(SAMPLE2)
-    require(part2 == "25272") { part2 }
-    println(part2(input))
+    test("40") { part1(SAMPLE1, 10) }
+    benchmark("2025 Day 8 - Part 1: ") { part1(input, 1000) }
+    test("25272") { part2(SAMPLE2) }
+    benchmark("2025 Day 8 - Part 2: ") { part2(input) }
 }
 
 private fun part1(input: String, count: Int): String {

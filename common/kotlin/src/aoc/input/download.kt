@@ -1,7 +1,7 @@
 package aoc.input
 
 import io.ktor.client.*
-import io.ktor.client.plugins.DefaultRequest
+import io.ktor.client.plugins.*
 import io.ktor.client.plugins.cache.*
 import io.ktor.client.plugins.cache.storage.*
 import io.ktor.client.plugins.cookies.*
@@ -13,8 +13,7 @@ import kotlin.io.path.createDirectories
 import kotlin.io.path.readText
 
 suspend fun downloadInput(year: Int, day: Int): String {
-    require(day > 0)
-    require(year > 0)
+    require(day > 0 && year > 0) { "year=$year day=$day" }
 
     val client = HttpClient {
         expectSuccess = true

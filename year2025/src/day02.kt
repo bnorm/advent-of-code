@@ -1,8 +1,8 @@
 @file:Suppress("PackageDirectoryMismatch")
 
-package aoc.day02
+package aoc.year2025.day02
 
-import aoc.input.downloadInput
+import aoc.run
 
 const val SAMPLE1 = """
 11-22,95-115,998-1012,1188511880-1188511890,222220-222224,1698522-1698528,446443-446449,38593856-38593862,565653-565659,824824821-824824827,2121212118-2121212124
@@ -10,17 +10,10 @@ const val SAMPLE1 = """
 
 const val SAMPLE2 = SAMPLE1
 
-suspend fun main() {
-    val input = downloadInput(2025, 2)
-
-    val part1 = part1(SAMPLE1)
-    require(part1 == "1227775554") { part1 }
-    println(part1(input))
-
-    val part2 = part2(SAMPLE2)
-    require(part2 == "4174379265") { part2 }
-    println(part2(input))
-}
+suspend fun main() = run(
+    part1 = ::part1, sample1 = SAMPLE1, expected1 = "1227775554",
+    part2 = ::part2, sample2 = SAMPLE2, expected2 = "4174379265",
+)
 
 private fun part1(input: String): String {
     val ranges = input.trim().split(',')

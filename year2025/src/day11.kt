@@ -1,6 +1,6 @@
 @file:Suppress("PackageDirectoryMismatch")
 
-package aoc.day11
+package aoc.year2025.day11
 
 import aoc.run
 
@@ -34,7 +34,6 @@ hhh: out
 """
 
 suspend fun main() = run(
-    year = 2025, day = 11,
     part1 = ::part1, sample1 = SAMPLE1, expected1 = "5",
     part2 = ::part2, sample2 = SAMPLE2, expected2 = "2",
 )

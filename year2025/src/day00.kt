@@ -1,26 +1,18 @@
 @file:Suppress("PackageDirectoryMismatch")
 
-package aoc.day00
+package aoc.year2025.day00
 
-import aoc.input.downloadInput
-import kotlin.time.measureTimedValue
+import aoc.run
 
 const val SAMPLE1 = """
 """
 
 const val SAMPLE2 = SAMPLE1
 
-suspend fun main() {
-    val input = downloadInput(2025, 0)
-
-    val part1 = part1(SAMPLE1)
-    require(part1 == "") { part1 }
-    println(measureTimedValue { part1(input) })
-
-    val part2 = part2(SAMPLE2)
-    require(part2 == "") { part2 }
-    println(measureTimedValue { part2(input) })
-}
+suspend fun main() = run(
+    part1 = ::part1, sample1 = SAMPLE1, expected1 = "",
+    part2 = ::part2, sample2 = SAMPLE2, expected2 = "",
+)
 
 private fun part1(input: String): String {
     TODO()

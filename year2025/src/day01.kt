@@ -1,8 +1,8 @@
 @file:Suppress("PackageDirectoryMismatch")
 
-package aoc.day01
+package aoc.year2025.day01
 
-import aoc.input.downloadInput
+import aoc.run
 
 const val SAMPLE1 = """
 L68
@@ -19,17 +19,10 @@ L82
 
 const val SAMPLE2 = SAMPLE1
 
-suspend fun main() {
-    val input = downloadInput(2025, 1)
-
-    val part1 = part1(SAMPLE1)
-    require(part1 == "3") { part1 }
-    println(part1(input))
-
-    val part2 = part2(SAMPLE2)
-    require(part2 == "6") { part2 }
-    println(part2(input))
-}
+suspend fun main() = run(
+    part1 = ::part1, sample1 = SAMPLE1, expected1 = "3",
+    part2 = ::part2, sample2 = SAMPLE2, expected2 = "6",
+)
 
 private fun part1(input: String): String {
     val directions = input.trim().lines()
